@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.EveryTask" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/ghost</item>
+        <item name="colorPrimaryVariant">@color/yonder</item>
+        <item name="colorOnPrimary">@color/raisin</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/cerulean</item>
+        <item name="colorSecondaryVariant">@color/cerulean</item>
+        <item name="colorOnSecondary">@color/raisin</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>
