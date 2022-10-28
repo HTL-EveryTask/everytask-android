@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.EveryTask" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/ghost</item>
+        <item name="colorPrimary">@color/rebecca</item>
         <item name="colorPrimaryVariant">@color/yonder</item>
         <item name="colorOnPrimary">@color/raisin</item>
         <!-- Secondary brand color. -->

@@ -2,16 +2,22 @@ package com.example.everytask
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Patterns
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import com.example.everytask.databinding.ActivityLoginBinding
+import com.example.everytask.databinding.ActivityMainBinding
+import com.example.everytask.databinding.ActivityRegisterBinding
 import com.example.everytask.fragments.ConnectionsFragment
 import com.example.everytask.fragments.GroupsFragment
 import com.example.everytask.fragments.HomeFragment
 import com.example.everytask.fragments.SettingsFragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
-
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var mainBinding: ActivityMainBinding
+    private lateinit var loginBinding: ActivityLoginBinding
+    private lateinit var registerBinding: ActivityRegisterBinding
 
     private val homeFragment = HomeFragment()
     private val groupsFragment = GroupsFragment()
@@ -21,7 +27,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        setContentView(R.layout.activity_register)
+        loginBinding = ActivityLoginBinding.inflate(layoutInflater)
+        registerBinding = ActivityRegisterBinding.inflate(layoutInflater)
+        toLogin(loginBinding.root)
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -31,10 +39,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun login(view: View) {
-        setContentView(R.layout.activity_main)
+
+        mainBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(mainBinding.root)
         replaceFragment(homeFragment)
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNavigationView.setOnItemSelectedListener {
+        mainBinding.bottomNavigation.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> replaceFragment(homeFragment)
                 R.id.groups -> replaceFragment(groupsFragment)
@@ -46,11 +55,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun register(view: View) {
-        setContentView(R.layout.activity_main)
+        mainBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(mainBinding.root)
         replaceFragment(homeFragment)
-
-        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNavigation.setOnItemSelectedListener {
+        mainBinding.bottomNavigation.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> replaceFragment(homeFragment)
                 R.id.groups -> replaceFragment(groupsFragment)
@@ -62,10 +70,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun toLogin(view: View) {
-        setContentView(R.layout.activity_login)
+        setContentView(loginBinding.root)
+        emailFocusListener()
     }
 
     fun toRegister(view: View) {
-        setContentView(R.layout.activity_register)
+        setContentView(registerBinding.root)
+    }
+
+    private fun emailFocusListener() {
+        loginBinding.emailEditText.setOnFocusChangeListener { _, focused ->
+            if (!focused) {
+                loginBinding.emailContainer.helperText = validEmail()
+            }
+        }
+    }
+
+    private fun validEmail(): String? {
+        val email = loginBinding.emailEditText.text.toString()
+        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            return "Invalid Email Address"
+        }
+        return null
     }
 }
