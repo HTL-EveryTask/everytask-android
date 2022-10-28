@@ -2,7 +2,6 @@ package com.example.everytask
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
@@ -21,7 +20,32 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        setContentView(R.layout.activity_register)
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, fragment)
+        transaction.commit()
+    }
+
+    fun login(view: View) {
+        setContentView(R.layout.activity_main)
+        replaceFragment(homeFragment)
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNavigationView.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.home -> replaceFragment(homeFragment)
+                R.id.groups -> replaceFragment(groupsFragment)
+                R.id.connections -> replaceFragment(connectionsFragment)
+                R.id.settings -> replaceFragment(settingsFragment)
+            }
+            true
+        }
+    }
+
+    fun register(view: View) {
         setContentView(R.layout.activity_main)
         replaceFragment(homeFragment)
 
@@ -37,9 +61,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun replaceFragment(fragment: Fragment) {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragment_container, fragment)
-        transaction.commit()
+    fun toLogin(view: View) {
+        setContentView(R.layout.activity_login)
+    }
+
+    fun toRegister(view: View) {
+        setContentView(R.layout.activity_register)
     }
 }
