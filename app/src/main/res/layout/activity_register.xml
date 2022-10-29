@@ -1,181 +1,195 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/ll_registerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30sp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:layout_marginLeft="30sp"
-        android:layout_marginRight="30sp">
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/register_title"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:textColor="@color/raisin"
-        android:layout_marginBottom="20sp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingVertical="5sp">
         <TextView
+            android:id="@+id/tv_registerTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/username"
-            android:labelFor="@id/username"/>
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="20sp"
+            android:text="@string/register_title"
+            android:textColor="@color/raisin"
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
+            android:id="@+id/ll_usernameContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-            app:boxBackgroundColor="@android:color/transparent">
+            android:orientation="vertical"
+            android:paddingVertical="5sp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/username"
+            <TextView
+                android:id="@+id/tv_usernameLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/et_username"
+                android:text="@string/username" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_usernameContainer"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="0dp"
-                android:inputType="textPersonName"
-                android:autofillHints="username"
-                tools:ignore="RtlSymmetry" />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+                app:boxBackgroundColor="@android:color/transparent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:labelFor="@id/email"
-        android:paddingVertical="5sp">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/email"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="username"
+                    android:inputType="textPersonName"
+                    android:paddingStart="0dp"
+                    tools:ignore="RtlSymmetry" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
+            android:id="@+id/ll_emailContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-            app:boxBackgroundColor="@android:color/transparent"
-            >
+            android:orientation="vertical"
+            android:paddingVertical="5sp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/email"
+            <TextView
+                android:id="@+id/tv_emailLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/et_email"
+                android:text="@string/email" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_emailContainer"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="0dp"
-                android:inputType="textEmailAddress"
-                android:autofillHints="emailAddress"
-                tools:ignore="RtlSymmetry" />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+                app:boxBackgroundColor="@android:color/transparent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingVertical="5sp">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/password"
-            android:labelFor="@id/password"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="emailAddress"
+                    android:inputType="textEmailAddress"
+                    android:paddingStart="0dp"
+                    tools:ignore="RtlSymmetry" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
+            android:id="@+id/ll_passwordContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-            app:boxBackgroundColor="@android:color/transparent"
-            app:passwordToggleEnabled="true"
-            tools:targetApi="p">
+            android:orientation="vertical"
+            android:paddingVertical="5sp">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <TextView
+                android:id="@+id/tv_passwordLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/et_password"
+                android:text="@string/password" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_passwordContainer"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/password"
-                android:paddingStart="0dp"
-                tools:ignore="RtlSymmetry"
-                android:importantForAutofill="no"
-                />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_height="wrap_content"
+                app:boxBackgroundColor="@android:color/transparent"
+                app:passwordToggleEnabled="true">
 
-    </LinearLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAutofill="no"
+                    android:inputType="textPassword"
+                    android:paddingStart="0dp"
+                    tools:ignore="RtlSymmetry" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
 
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingVertical="5sp">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/password_confirm"
-            android:labelFor="@id/password_confirm"/>
-
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
+            android:id="@+id/ll_confirmPasswordContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-            app:boxBackgroundColor="@android:color/transparent"
-            app:passwordToggleEnabled="true"
-            tools:targetApi="p">
+            android:orientation="vertical"
+            android:paddingVertical="5sp">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <TextView
+                android:id="@+id/tv_confirmPasswordLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/et_confirmPassword"
+                android:text="@string/confirmPassword" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/password_confirm"
-                android:paddingStart="0dp"
-                tools:ignore="RtlSymmetry"
-                android:importantForAutofill="no"
-                />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+                android:layout_height="wrap_content"
+                app:boxBackgroundColor="@android:color/transparent"
+                app:passwordToggleEnabled="true">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_confirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAutofill="no"
+                    android:inputType="textPassword"
+                    android:paddingStart="0dp"
+                    tools:ignore="RtlSymmetry" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
 
         <Button
+            android:id="@+id/btn_register"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/register"
-            android:onClick="register"
             android:backgroundTint="@color/ghost"
+            android:onClick="register"
+            android:text="@string/register"
             tools:ignore="UsingOnClickInXml" />
 
         <LinearLayout
+            android:id="@+id/ll_toLogin"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10sp">
 
             <TextView
-                android:layout_marginStart="10sp"
+                android:id="@+id/tv_alreadyHaveAccount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10sp"
                 android:text="@string/already_have_an_account" />
 
             <TextView
+                android:id="@+id/tv_toLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/login"
-                android:onClick="toLogin"
                 android:layout_marginStart="10sp"
-                tools:ignore="UsingOnClickInXml"
-                android:textColor="@color/raisin"/>
+                android:onClick="toLogin"
+                android:text="@string/login"
+                android:textColor="@color/raisin"
+                tools:ignore="UsingOnClickInXml" />
 
         </LinearLayout>
 

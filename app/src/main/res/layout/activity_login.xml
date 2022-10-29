@@ -1,122 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/ll_loginContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30sp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:layout_marginLeft="30sp"
-        android:layout_marginRight="30sp">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/tv_loginTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginBottom="20sp"
             android:text="@string/login_title"
-            android:textSize="30sp"
-            android:textStyle="bold"
             android:textColor="@color/raisin"
-            android:layout_marginBottom="20sp"/>
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
         <LinearLayout
+            android:id="@+id/ll_emailContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingVertical="5sp">
+
             <TextView
+                android:id="@+id/tv_emailLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/email"/>
+                android:labelFor="@id/et_email"
+                android:text="@string/email" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_emailContainer"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                app:boxBackgroundColor="@android:color/transparent"
-                android:id="@+id/emailContainer"
-                app:helperTextTextColor="@color/red"
-                >
+                app:boxBackgroundColor="@android:color/transparent">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/emailEditText"
+                    android:id="@+id/et_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingStart="0dp"
-                    android:inputType="textEmailAddress"
                     android:autofillHints="emailAddress"
+                    android:inputType="textEmailAddress"
+                    android:paddingStart="0dp"
                     tools:ignore="RtlSymmetry" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ll_passwordContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingVertical="5sp">
+
             <TextView
+                android:id="@+id/tv_passwordLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/password"
-                android:labelFor="@id/password"/>
+                android:labelFor="@id/et_password"
+                android:text="@string/password" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_passwordContainer"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 app:boxBackgroundColor="@android:color/transparent"
-                app:passwordToggleEnabled="true"
-                tools:targetApi="p">
+                app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_password"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/password"
-                    android:paddingStart="0dp"
-                    tools:ignore="RtlSymmetry"
+                    android:layout_height="wrap_content"
                     android:importantForAutofill="no"
-                    />
+                    android:inputType="textPassword"
+                    android:paddingStart="0dp"
+                    tools:ignore="RtlSymmetry" />
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
 
         <Button
+            android:id="@+id/btn_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/login"
-            android:onClick="login"
             android:backgroundTint="@color/ghost"
+            android:onClick="login"
+            android:text="@string/login"
             tools:ignore="UsingOnClickInXml" />
 
         <LinearLayout
+            android:id="@+id/ll_toRegister"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10sp">
 
             <TextView
-                android:layout_marginStart="10sp"
+                android:id="@+id/tv_haveNoAccount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/have_no_account"/>
+                android:layout_marginStart="10sp"
+                android:text="@string/have_no_account" />
 
             <TextView
+                android:id="@+id/tv_toRegister"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/register"
-                android:onClick="toRegister"
                 android:layout_marginStart="10sp"
-                tools:ignore="UsingOnClickInXml"
-                android:textColor="@color/raisin"/>
+                android:onClick="toRegister"
+                android:text="@string/register"
+                android:textColor="@color/raisin"
+                tools:ignore="UsingOnClickInXml" />
 
         </LinearLayout>
 
