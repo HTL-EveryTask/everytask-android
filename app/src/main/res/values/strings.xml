@@ -19,4 +19,7 @@
     <string name="login">Login</string>
     <string name="login_title">Login to &appname;</string>
     <string name="have_no_account">Need an account?</string>
+    <string name="usernameMock">test1</string>
+    <string name="emailMock">8082@htl.rennweg.at</string>
+    <string name="passwordMock">Password_1</string>
 </resources>

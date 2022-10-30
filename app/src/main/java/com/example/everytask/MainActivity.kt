@@ -1,9 +1,11 @@
 package com.example.everytask
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.example.everytask.databinding.ActivityLoginBinding
@@ -13,14 +15,25 @@ import com.example.everytask.fragments.ConnectionsFragment
 import com.example.everytask.fragments.GroupsFragment
 import com.example.everytask.fragments.HomeFragment
 import com.example.everytask.fragments.SettingsFragment
+import com.example.everytask.models.Login
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
 
 class MainActivity : AppCompatActivity() {
+
+    var BASE_URL = "http://192.168.0.68:8000/api/"
 
     private lateinit var mainBinding: ActivityMainBinding
     private lateinit var loginBinding: ActivityLoginBinding
     private lateinit var registerBinding: ActivityRegisterBinding
+
+    private lateinit var retrofitBuilder: ApiInterface
 
     private val homeFragment = HomeFragment()
     private val groupsFragment = GroupsFragment()
@@ -30,9 +43,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         loginBinding = ActivityLoginBinding.inflate(layoutInflater)
         registerBinding = ActivityRegisterBinding.inflate(layoutInflater)
+
+        retrofitBuilder = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .build()
+            .create(ApiInterface::class.java)
+
         toLogin(loginBinding.root)
     }
 
@@ -46,17 +67,30 @@ class MainActivity : AppCompatActivity() {
         val validEmail = validEmail(loginBinding.etEmail.text.toString()) == null
 
         if (validEmail) {
-            setContentView(mainBinding.root)
-            replaceFragment(homeFragment)
-            mainBinding.bottomNavigation.setOnItemSelectedListener {
-                when (it.itemId) {
-                    R.id.home -> replaceFragment(homeFragment)
-                    R.id.groups -> replaceFragment(groupsFragment)
-                    R.id.connections -> replaceFragment(connectionsFragment)
-                    R.id.settings -> replaceFragment(settingsFragment)
+            val retrofitData = retrofitBuilder.loginUser(
+                loginBinding.etEmail.text.toString(),
+                loginBinding.etPassword.text.toString()
+            )
+
+            retrofitData.enqueue(object : Callback<Login> {
+                override fun onResponse(call: Call<Login>, response: Response<Login>) {
+                    if (response.isSuccessful) {
+                        Log.d("Login", "onResponse: ${response.body()}")
+
+                        if(response.body()?.type == "Success") {
+                            loginRedirect(response.body()?.token)
+                        }else {
+                            loginBinding.tilEmailContainer.error = "Invalid email or password"
+                            loginBinding.tilPasswordContainer.error = "Invalid email or password"
+                        }
+                    }
                 }
-                true
-            }
+
+                override fun onFailure(call: Call<Login>, t: Throwable) {
+                    Log.d("Login", t.message.toString())
+                }
+            })
+
         }
     }
 
@@ -67,17 +101,56 @@ class MainActivity : AppCompatActivity() {
             registerBinding.etPassword.text.toString() == registerBinding.etConfirmPassword.text.toString()
 
         if(validEmail && validPassword && validConfirmPassword) {
-            setContentView(mainBinding.root)
-            replaceFragment(homeFragment)
-            mainBinding.bottomNavigation.setOnItemSelectedListener {
-                when (it.itemId) {
-                    R.id.home -> replaceFragment(homeFragment)
-                    R.id.groups -> replaceFragment(groupsFragment)
-                    R.id.connections -> replaceFragment(connectionsFragment)
-                    R.id.settings -> replaceFragment(settingsFragment)
+            val retrofitData = retrofitBuilder.registerUser(
+                registerBinding.etUsername.text.toString(),
+                registerBinding.etEmail.text.toString(),
+                registerBinding.etPassword.text.toString(),
+                false
+            )
+
+            retrofitData.enqueue(object : Callback<Login> {
+                override fun onResponse(
+                    call: Call<Login>,
+                    response: Response<Login>
+                ) {
+                    if (response.isSuccessful) {
+                        Log.d("Register", "onResponse: ${response.body()}")
+
+                        if(response.body()?.type == "Success") {
+                            loginRedirect(response.body()?.token)
+                        }else {
+                            registerBinding.tilEmailContainer.error = "Email already exists"
+                        }
+                    }
                 }
-                true
+
+                override fun onFailure(call: Call<Login>, t: Throwable) {
+                    Log.d("Register", "onFailure: ${t.message}")
+                }
+            })
+        }
+    }
+
+    fun loginRedirect(token: String? = null) {
+        val sharedPreferences: SharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
+        val editor: SharedPreferences.Editor = sharedPreferences.edit()
+        editor.apply {
+            putString("TOKEN", token)
+        }.apply()
+
+        //log token
+        Log.d("Token", "loginRedirect: $token")
+
+        setContentView(mainBinding.root)
+        replaceFragment(homeFragment)
+        mainBinding.bottomNavigation.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.home -> replaceFragment(homeFragment)
+                R.id.groups -> replaceFragment(groupsFragment)
+                R.id.connections -> replaceFragment(connectionsFragment)
+                R.id.settings -> replaceFragment(settingsFragment)
             }
+            true
         }
     }
 
@@ -93,7 +166,8 @@ class MainActivity : AppCompatActivity() {
         passwordFocusListener(
             registerBinding.etPassword,
             registerBinding.tilPasswordContainer,
-            registerBinding.tilConfirmPasswordContainer
+            registerBinding.tilConfirmPasswordContainer,
+            registerBinding.etConfirmPassword
         )
         confirmPasswordFocusListener()
     }
@@ -124,14 +198,21 @@ class MainActivity : AppCompatActivity() {
     private fun passwordFocusListener(
         etPassword: TextInputEditText,
         tilPasswordContainer: TextInputLayout,
-        tilConfirmPasswordContainer: TextInputLayout? = null
+        tilConfirmPasswordContainer: TextInputLayout? = null,
+        etConfirmPassword: TextInputEditText? = null
     ) {
         // TODO : ERROR MAYBE?? statt helperText
         etPassword.setOnFocusChangeListener { _, focused ->
             if (!focused) {
                 tilPasswordContainer.helperText = validPassword(etPassword.text.toString())
-                    tilConfirmPasswordContainer?.helperText =
-                        "Passwords do not match"
+                if (etConfirmPassword != null && tilConfirmPasswordContainer != null) {
+                    if (etPassword.text.toString() != etConfirmPassword.text.toString()) {
+                        tilConfirmPasswordContainer.helperText =
+                            "Passwords do not match"
+                    } else {
+                        tilConfirmPasswordContainer.helperText = null
+                    }
+                }
             }
         }
     }

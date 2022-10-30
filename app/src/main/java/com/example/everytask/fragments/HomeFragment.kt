@@ -1,60 +1,67 @@
 package com.example.everytask.fragments
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.everytask.R
+import com.example.everytask.ApiInterface
+import com.example.everytask.models.TestItem
+import com.example.everytask.databinding.FragmentHomeBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class HomeFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    var BASE_URL = "https://jsonplaceholder.typicode.com/"
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
+        val sharedPref = activity?.getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
+        val token = sharedPref?.getString("TOKEN", null)
+
+        Log.d("token", token.toString())
+
+        binding.tvHome.text = token
+
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HomeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun getData() {
+        val retrofitBuilder = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .build()
+            .create(ApiInterface::class.java)
+
+        val retrofitData = retrofitBuilder.getData()
+
+        retrofitData.enqueue(object : Callback<List<TestItem>> {
+            override fun onResponse(call: Call<List<TestItem>>, response: Response<List<TestItem>>) {
+                val responseBody = response.body()!!
+
+                val myStringBuilder = StringBuilder()
+                for(myData in responseBody) {
+                    myStringBuilder.append(myData.id)
+                    myStringBuilder.append("\n")
                 }
+                binding.tvHome.text = myStringBuilder
             }
+            override fun onFailure(call: Call<List<TestItem>>, t: Throwable) {
+                Log.d("MainActivity", "onFailure: ${t.message}")
+            }
+        })
     }
 }

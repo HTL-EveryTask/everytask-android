@@ -57,7 +57,8 @@
                     android:autofillHints="emailAddress"
                     android:inputType="textEmailAddress"
                     android:paddingStart="0dp"
-                    tools:ignore="RtlSymmetry" />
+                    tools:ignore="RtlSymmetry"
+                    android:text="@string/emailMock"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
@@ -91,7 +92,8 @@
                     android:importantForAutofill="no"
                     android:inputType="textPassword"
                     android:paddingStart="0dp"
-                    tools:ignore="RtlSymmetry" />
+                    tools:ignore="RtlSymmetry"
+                    android:text="@string/passwordMock"/>
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
