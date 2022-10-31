@@ -1,6 +1,7 @@
 package com.example.everytask.fragments
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -8,8 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.everytask.ApiInterface
-import com.example.everytask.models.TestItem
+import com.example.everytask.TaskAdapter
 import com.example.everytask.databinding.FragmentHomeBinding
+import com.example.everytask.models.Default
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,7 +20,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class HomeFragment : Fragment() {
 
-    var BASE_URL = "https://jsonplaceholder.typicode.com/"
+    private lateinit var BASE_URL: String
+    private lateinit var TOKEN: String
+
+    private lateinit var retrofitBuilder: ApiInterface
+
+    private lateinit var sharedPreferences: SharedPreferences
+
+    private lateinit var taskAdapter: TaskAdapter
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -29,39 +38,55 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        val sharedPref = activity?.getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
-        val token = sharedPref?.getString("TOKEN", null)
+        sharedPreferences =
+            requireActivity().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
 
-        Log.d("token", token.toString())
+        TOKEN = sharedPreferences.getString("TOKEN", null)!!
+        BASE_URL = sharedPreferences.getString("BASE_URL", null).toString()
 
-        binding.tvHome.text = token
+        Log.d("TAG", TOKEN)
 
-        return binding.root
-    }
-
-    private fun getData() {
-        val retrofitBuilder = Retrofit.Builder()
+        retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_URL)
             .build()
             .create(ApiInterface::class.java)
 
-        val retrofitData = retrofitBuilder.getData()
+        getTasks()
 
-        retrofitData.enqueue(object : Callback<List<TestItem>> {
-            override fun onResponse(call: Call<List<TestItem>>, response: Response<List<TestItem>>) {
-                val responseBody = response.body()!!
+        //TODO add swipe to refresh
+        //TODO add add task button
+        //TODO delete task
+        //TODO edit task
+        //TODO recyclerview wiederholt sich?
 
-                val myStringBuilder = StringBuilder()
-                for(myData in responseBody) {
-                    myStringBuilder.append(myData.id)
-                    myStringBuilder.append("\n")
+        return binding.root
+    }
+
+    fun getTasks() {
+        val call = retrofitBuilder.getTasks(TOKEN)
+        call.enqueue(object : Callback<Default> {
+            override fun onResponse(call: Call<Default>, response: Response<Default>) {
+
+                Log.d("TAG", "onResponse: ${response.body()}")
+
+                if (response.isSuccessful) {
+                    val default = response.body()
+                    val tasks = default?.data
+
+                    taskAdapter = TaskAdapter(tasks!!)
+                    binding.rvTasks.adapter = taskAdapter
+
                 }
-                binding.tvHome.text = myStringBuilder
             }
-            override fun onFailure(call: Call<List<TestItem>>, t: Throwable) {
-                Log.d("MainActivity", "onFailure: ${t.message}")
+            override fun onFailure(call: Call<Default>, t: Throwable) {
+                Log.d("TAG", "onFailure: ${t.message}")
             }
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

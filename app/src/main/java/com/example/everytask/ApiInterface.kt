@@ -1,27 +1,40 @@
 package com.example.everytask
 
-import com.example.everytask.models.Login
-import com.example.everytask.models.TestItem
+import com.example.everytask.models.Default
 import retrofit2.Call
-import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface ApiInterface {
 
-    @GET("posts")
-    fun getData(): Call<List<TestItem>>
-
-    @GET("register_user")
+    @POST("register_user")
     fun registerUser(
         @Query("username") name: String,
         @Query("email") email: String,
         @Query("password") password: String,
-        @Query("is_teacher") is_teacher: Boolean
-    ): Call<Login>
+        @Query("is_teacher") is_teacher: Boolean?
+    ): Call<Default>
 
-    @GET("login_user")
+    @POST("login_user")
     fun loginUser(
         @Query("email") email: String,
         @Query("password") password: String
-    ): Call<Login>
+    ): Call<Default>
+
+    @POST("task/get")
+    fun getTasks(
+        @Query("token") token: String
+    ): Call<Default>
+
+    //add task
+    @POST("task/add")
+    fun addTask(
+        @Query("token") token: String,
+        @Query("title") title: String,
+        @Query("description") description: String,
+        @Query("due_time") due_time: String?,
+        @Query("create_time") create_time: String?,
+        @Query("note") note: String,
+        @Query("group_id") group_id: Int?,
+    ): Call<Default>
 }

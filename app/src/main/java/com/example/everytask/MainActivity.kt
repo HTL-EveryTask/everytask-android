@@ -15,7 +15,7 @@ import com.example.everytask.fragments.ConnectionsFragment
 import com.example.everytask.fragments.GroupsFragment
 import com.example.everytask.fragments.HomeFragment
 import com.example.everytask.fragments.SettingsFragment
-import com.example.everytask.models.Login
+import com.example.everytask.models.Default
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import retrofit2.Call
@@ -27,7 +27,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
 
-    var BASE_URL = "http://192.168.0.68:8000/api/"
+    private var BASE_URL = "http://192.168.0.68:8000/api/"
+
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
 
     private lateinit var mainBinding: ActivityMainBinding
     private lateinit var loginBinding: ActivityLoginBinding
@@ -41,12 +44,22 @@ class MainActivity : AppCompatActivity() {
     private val settingsFragment = SettingsFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //TODO lock screen orientation
+
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         loginBinding = ActivityLoginBinding.inflate(layoutInflater)
         registerBinding = ActivityRegisterBinding.inflate(layoutInflater)
+
+        sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
+        editor = sharedPreferences.edit()
+
+        if (sharedPreferences.getString("BASE_URL", null) == null) {
+            editor.putString("BASE_URL", BASE_URL)
+            editor.apply()
+        }
 
         retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
@@ -72,10 +85,10 @@ class MainActivity : AppCompatActivity() {
                 loginBinding.etPassword.text.toString()
             )
 
-            retrofitData.enqueue(object : Callback<Login> {
-                override fun onResponse(call: Call<Login>, response: Response<Login>) {
+            retrofitData.enqueue(object : Callback<Default> {
+                override fun onResponse(call: Call<Default>, response: Response<Default>) {
                     if (response.isSuccessful) {
-                        Log.d("Login", "onResponse: ${response.body()}")
+                        Log.d("TAG", "onResponse: ${response.body()}")
 
                         if(response.body()?.type == "Success") {
                             loginRedirect(response.body()?.token)
@@ -86,8 +99,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                override fun onFailure(call: Call<Login>, t: Throwable) {
-                    Log.d("Login", t.message.toString())
+                override fun onFailure(call: Call<Default>, t: Throwable) {
+                    Log.d("TAG", t.message.toString())
                 }
             })
 
@@ -108,13 +121,13 @@ class MainActivity : AppCompatActivity() {
                 false
             )
 
-            retrofitData.enqueue(object : Callback<Login> {
+            retrofitData.enqueue(object : Callback<Default> {
                 override fun onResponse(
-                    call: Call<Login>,
-                    response: Response<Login>
+                    call: Call<Default>,
+                    response: Response<Default>
                 ) {
                     if (response.isSuccessful) {
-                        Log.d("Register", "onResponse: ${response.body()}")
+                        Log.d("TAG", "onResponse: ${response.body()}")
 
                         if(response.body()?.type == "Success") {
                             loginRedirect(response.body()?.token)
@@ -124,22 +137,19 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                override fun onFailure(call: Call<Login>, t: Throwable) {
-                    Log.d("Register", "onFailure: ${t.message}")
+                override fun onFailure(call: Call<Default>, t: Throwable) {
+                    Log.d("TAG", "onFailure: ${t.message}")
                 }
             })
         }
     }
 
     fun loginRedirect(token: String? = null) {
-        val sharedPreferences: SharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
-        val editor: SharedPreferences.Editor = sharedPreferences.edit()
         editor.apply {
             putString("TOKEN", token)
         }.apply()
 
-        //log token
-        Log.d("Token", "loginRedirect: $token")
+        Log.d("TAG", "loginRedirect: $token")
 
         setContentView(mainBinding.root)
         replaceFragment(homeFragment)
