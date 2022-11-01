@@ -8,15 +8,22 @@ import com.example.everytask.models.Task
 
 class TaskAdapter(val taskList: List<Task>): RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
-    class TaskViewHolder(val itemBinding: RowTasksBinding): RecyclerView.ViewHolder(itemBinding.root){
+    //make checkbox array to save which tasks are done
+    public var checked = BooleanArray(taskList.size)
+
+    class TaskViewHolder(val itemBinding: RowTasksBinding, val checked: BooleanArray): RecyclerView.ViewHolder(itemBinding.root){
         fun bind(task: Task){
             itemBinding.tvTaskTitle.text = task.title
             itemBinding.tvTaskDescription.text = task.description
+            itemBinding.cbDone.isChecked = checked[adapterPosition]
+            itemBinding.cbDone.setOnCheckedChangeListener { buttonView, isChecked ->
+                checked[adapterPosition] = isChecked
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
-        return TaskViewHolder(RowTasksBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        return TaskViewHolder(RowTasksBinding.inflate(LayoutInflater.from(parent.context), parent, false),checked)
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {

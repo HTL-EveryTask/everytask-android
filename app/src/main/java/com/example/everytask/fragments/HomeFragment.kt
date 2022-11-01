@@ -58,7 +58,12 @@ class HomeFragment : Fragment() {
         //TODO add add task button
         //TODO delete task
         //TODO edit task
-        //TODO recyclerview wiederholt sich?
+
+        //swipe to refresh
+        binding.swipeContainer.setOnRefreshListener {
+            getTasks()
+            binding.swipeContainer.isRefreshing = false
+        }
 
         return binding.root
     }

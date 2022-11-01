@@ -44,7 +44,10 @@ class MainActivity : AppCompatActivity() {
     private val settingsFragment = SettingsFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //TODO lock screen orientation
+        /*TODO check screen orientation with kiki in AndroidManifest.xml
+        https://developer.android.com/guide/topics/manifest/activity-element.html#screen
+        */
+
 
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -90,9 +93,9 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         Log.d("TAG", "onResponse: ${response.body()}")
 
-                        if(response.body()?.type == "Success") {
+                        if (response.body()?.type == "Success") {
                             loginRedirect(response.body()?.token)
-                        }else {
+                        } else {
                             loginBinding.tilEmailContainer.error = "Invalid email or password"
                             loginBinding.tilPasswordContainer.error = "Invalid email or password"
                         }
@@ -113,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         val validConfirmPassword =
             registerBinding.etPassword.text.toString() == registerBinding.etConfirmPassword.text.toString()
 
-        if(validEmail && validPassword && validConfirmPassword) {
+        if (validEmail && validPassword && validConfirmPassword) {
             val retrofitData = retrofitBuilder.registerUser(
                 registerBinding.etUsername.text.toString(),
                 registerBinding.etEmail.text.toString(),
@@ -129,9 +132,9 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         Log.d("TAG", "onResponse: ${response.body()}")
 
-                        if(response.body()?.type == "Success") {
+                        if (response.body()?.type == "Success") {
                             loginRedirect(response.body()?.token)
-                        }else {
+                        } else {
                             registerBinding.tilEmailContainer.error = "Email already exists"
                         }
                     }
