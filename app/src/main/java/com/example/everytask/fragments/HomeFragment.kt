@@ -1,5 +1,6 @@
 package com.example.everytask.fragments
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -12,6 +13,7 @@ import com.example.everytask.ApiInterface
 import com.example.everytask.TaskAdapter
 import com.example.everytask.databinding.FragmentHomeBinding
 import com.example.everytask.models.Default
+import com.example.everytask.models.Task
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,9 +28,6 @@ class HomeFragment : Fragment() {
     private lateinit var retrofitBuilder: ApiInterface
 
     private lateinit var sharedPreferences: SharedPreferences
-
-    private lateinit var taskAdapter: TaskAdapter
-
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -54,12 +53,10 @@ class HomeFragment : Fragment() {
 
         getTasks()
 
-        //TODO add swipe to refresh
         //TODO add add task button
-        //TODO delete task
         //TODO edit task
+        //TODO implement back gesture
 
-        //swipe to refresh
         binding.swipeContainer.setOnRefreshListener {
             getTasks()
             binding.swipeContainer.isRefreshing = false
@@ -68,7 +65,7 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    fun getTasks() {
+    fun getTasks(homeFragment: HomeFragment = this) {
         val call = retrofitBuilder.getTasks(TOKEN)
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
@@ -79,15 +76,47 @@ class HomeFragment : Fragment() {
                     val default = response.body()
                     val tasks = default?.data
 
-                    taskAdapter = TaskAdapter(tasks!!)
+                    val taskAdapter = TaskAdapter(tasks!!, homeFragment)
                     binding.rvTasks.adapter = taskAdapter
 
                 }
             }
+
             override fun onFailure(call: Call<Default>, t: Throwable) {
                 Log.d("TAG", "onFailure: ${t.message}")
             }
         })
+    }
+
+    fun deleteTask(task: Task) {
+        val call = retrofitBuilder.deleteTask(TOKEN, task.pk_task_id)
+        call.enqueue(object : Callback<Default> {
+            override fun onResponse(call: Call<Default>, response: Response<Default>) {
+
+                Log.d("TAG", "onResponse: ${response.body()}")
+
+                if (response.isSuccessful) {
+                    getTasks()
+                }
+            }
+
+            override fun onFailure(call: Call<Default>, t: Throwable) {
+                Log.d("TAG", "onFailure: ${t.message}")
+            }
+        })
+    }
+
+    fun showDeleteAlert(task: Task){
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Delete Task")
+        builder.setMessage("Are you sure you want to delete this task?")
+        builder.setPositiveButton("Confirm"){dialog, which ->
+            deleteTask(task)
+        }
+        builder.setNegativeButton("Cancel"){dialog, which ->
+            dialog.dismiss()
+        }
+        builder.show()
     }
 
     override fun onDestroyView() {

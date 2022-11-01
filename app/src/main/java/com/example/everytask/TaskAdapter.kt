@@ -1,29 +1,42 @@
 package com.example.everytask
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.everytask.databinding.RowTasksBinding
+import com.example.everytask.fragments.HomeFragment
 import com.example.everytask.models.Task
 
-class TaskAdapter(val taskList: List<Task>): RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+class TaskAdapter(val taskList: List<Task>, val homeFragment: HomeFragment): RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     //make checkbox array to save which tasks are done
-    public var checked = BooleanArray(taskList.size)
+    var checked = BooleanArray(taskList.size)
 
-    class TaskViewHolder(val itemBinding: RowTasksBinding, val checked: BooleanArray): RecyclerView.ViewHolder(itemBinding.root){
+    class TaskViewHolder(
+        val tasksBinding: RowTasksBinding,
+        val checked: BooleanArray,
+        val homeFragment: HomeFragment,
+    ): RecyclerView.ViewHolder(tasksBinding.root){
         fun bind(task: Task){
-            itemBinding.tvTaskTitle.text = task.title
-            itemBinding.tvTaskDescription.text = task.description
-            itemBinding.cbDone.isChecked = checked[adapterPosition]
-            itemBinding.cbDone.setOnCheckedChangeListener { buttonView, isChecked ->
+            tasksBinding.tvTaskTitle.text = task.title
+            tasksBinding.tvTaskDescription.text = task.due_time
+            tasksBinding.cbDone.isChecked = checked[adapterPosition]
+            tasksBinding.cbDone.setOnCheckedChangeListener { buttonView, isChecked ->
                 checked[adapterPosition] = isChecked
+            }
+            tasksBinding.flBtnDeleteContainer.setOnClickListener {
+                homeFragment.showDeleteAlert(task)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
-        return TaskViewHolder(RowTasksBinding.inflate(LayoutInflater.from(parent.context), parent, false),checked)
+        return TaskViewHolder(
+            RowTasksBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            checked,
+            homeFragment
+        )
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {

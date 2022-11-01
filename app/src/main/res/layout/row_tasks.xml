@@ -29,13 +29,13 @@
             android:id="@+id/ll_taskTextContainer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:layout_marginStart="8dp"
             android:gravity="center_vertical"
-            app:layout_constraintStart_toEndOf="@id/cb_done"
-            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btn_delete"
-            android:layout_marginStart="8dp">
+            app:layout_constraintEnd_toStartOf="@id/fl_btnDeleteContainer"
+            app:layout_constraintStart_toEndOf="@id/cb_done"
+            app:layout_constraintTop_toTopOf="parent">
 
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -43,35 +43,44 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:text="@string/emailMock"
                 android:textColor="@color/raisin"
                 android:textSize="15sp"
-                android:textStyle="bold"
-                android:text="@string/emailMock"/>
+                android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_taskDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:text="@string/emailMock"
                 android:textColor="@color/raisin"
                 android:textSize="10sp"
-                android:text="@string/emailMock"
                 tools:ignore="SmallSp" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/btn_delete"
+
+        <FrameLayout
+            android:id="@+id/fl_btnDeleteContainer"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             app:layout_constraintLeft_toRightOf="@id/ll_taskTextContainer"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/ic_baseline_delete"
-            android:padding="8dp" />
+            android:padding="16dp">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/btn_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_baseline_delete"
+                android:clickable="false"
+                android:focusable="false"/>
+
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

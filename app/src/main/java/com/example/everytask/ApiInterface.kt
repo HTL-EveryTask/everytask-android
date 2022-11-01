@@ -26,7 +26,6 @@ interface ApiInterface {
         @Query("token") token: String
     ): Call<Default>
 
-    //add task
     @POST("task/add")
     fun addTask(
         @Query("token") token: String,
@@ -36,5 +35,12 @@ interface ApiInterface {
         @Query("create_time") create_time: String?,
         @Query("note") note: String,
         @Query("group_id") group_id: Int?,
+    ): Call<Default>
+
+    //delete task
+    @POST("task/remove")
+    fun deleteTask(
+        @Query("token") token: String,
+        @Query("task_id") task_id: String
     ): Call<Default>
 }
