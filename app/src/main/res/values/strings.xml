@@ -19,4 +19,12 @@
     <string name="usernameMock">test1</string>
     <string name="emailMock">8082@htl.rennweg.at</string>
     <string name="passwordMock">Password_1</string>
+    <string name="addtask">addTask</string>
+    <string name="back">Back</string>
+    <string name="add_task">Add Task</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="dueDate">Due</string>
+    <string name="save">Save</string>
+    <string name="logout">Logout</string>
 </resources>

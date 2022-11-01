@@ -16,10 +16,40 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".RegisterActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:noHistory="true">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".AddActivity"
-            android:exported="false"
-            android:screenOrientation="user"
-            tools:ignore="LockedOrientationActivity">
+            android:exported="true"
+            android:theme="@style/Theme.EveryTask.toolbar"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
+            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -27,14 +57,10 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="user"
-            tools:ignore="LockedOrientationActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
+            android:launchMode = "singleTop"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

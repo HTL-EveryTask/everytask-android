@@ -1,6 +1,5 @@
 package com.example.everytask
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +26,10 @@ class TaskAdapter(val taskList: List<Task>, val homeFragment: HomeFragment): Rec
             }
             tasksBinding.flBtnDeleteContainer.setOnClickListener {
                 homeFragment.showDeleteAlert(task)
+            }
+            tasksBinding.clTaskContainer.setOnClickListener {
+                /*val intent = Intent(homeFragment.context, EditActivity::class.java)
+                startActivity(homeFragment.requireContext(), intent, null)*/
             }
         }
     }

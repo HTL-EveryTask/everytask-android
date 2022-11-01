@@ -20,4 +20,15 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_addTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/addtask"
+        android:src="@drawable/ic_baseline_add_24"
+        app:backgroundTint="@color/rebecca"
+        app:tint="@color/ghost" />
+
 </FrameLayout>

@@ -9,6 +9,6 @@ data class Task(
     val is_done: Int,
     val location: String,
     val note: String,
-    val pk_task_id: String,
+    val id: String,
     val title: String
 )
