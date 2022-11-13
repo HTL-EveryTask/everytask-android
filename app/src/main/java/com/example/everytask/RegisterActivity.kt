@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.everytask.databinding.ActivityRegisterBinding
 import com.example.everytask.models.Default
@@ -35,6 +36,7 @@ class RegisterActivity : AppCompatActivity() {
             registerBinding.etConfirmPassword,
             registerBinding.etPassword
         )
+        usernameFocusListener(registerBinding.etUsername, registerBinding.tilUsernameContainer)
     }
 
     fun toLogin(view: View) {
@@ -45,12 +47,23 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     fun register(view: View) {
+        registerBinding.btnRegister.isEnabled = false
+        registerBinding.btnRegister.text = ""
+        registerBinding.pbRegister.visibility = View.VISIBLE
+
+        val username = registerBinding.etUsername.text.toString()
         val validEmail = validEmail(registerBinding.etEmail.text.toString()) == null
         val validPassword = validPassword(registerBinding.etPassword.text.toString()) == null
         val validConfirmPassword =
             registerBinding.etPassword.text.toString() == registerBinding.etConfirmPassword.text.toString()
 
-        if (validEmail && validPassword && validConfirmPassword) {
+        if(username.isEmpty()) {
+            registerBinding.tilUsernameContainer.error = "Username cannot be empty"
+        } else {
+            registerBinding.tilUsernameContainer.error = null
+        }
+
+        if (validEmail && validPassword && validConfirmPassword && username.isNotEmpty()) {
             val retrofitData = retrofitBuilder.registerUser(
                 registerBinding.etUsername.text.toString(),
                 registerBinding.etEmail.text.toString(),
@@ -81,6 +94,10 @@ class RegisterActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<Default>, t: Throwable) {
+                    Toast.makeText(this@RegisterActivity, "No connection to server", Toast.LENGTH_SHORT).show()
+                    registerBinding.btnRegister.isEnabled = true
+                    registerBinding.btnRegister.text = getString(R.string.register)
+                    registerBinding.pbRegister.visibility = View.GONE
                     Log.d("TAG", "onFailure: ${t.message}")
                 }
             })

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.example.everytask.*
 import com.example.everytask.databinding.FragmentHomeBinding
 import com.example.everytask.models.Default
@@ -59,7 +60,11 @@ class HomeFragment : Fragment() {
 
                     if (tasks != null) {
                         val adapter = TaskAdapter(tasks, homeFragment)
-                        binding.rvTasks.adapter = adapter
+                        try {
+                            binding.rvTasks.adapter = adapter
+                        } catch (e: Exception) {
+                            Log.d("TAG", e.toString())
+                        }
                     } else {
                         val adapter = TaskAdapter(arrayListOf(), homeFragment)
                         binding.rvTasks.adapter = adapter
@@ -69,6 +74,7 @@ class HomeFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<Default>, t: Throwable) {
+                Toast.makeText(context, "No connection to server", Toast.LENGTH_SHORT).show()
                 Log.d("TAG", "onFailure: ${t.message}")
             }
         })
@@ -89,6 +95,7 @@ class HomeFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<Default>, t: Throwable) {
+                Toast.makeText(context, "No connection to server", Toast.LENGTH_SHORT).show()
                 Log.d("TAG", "onFailure: ${t.message}")
             }
         })

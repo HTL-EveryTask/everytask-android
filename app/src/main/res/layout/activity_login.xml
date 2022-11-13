@@ -98,14 +98,32 @@
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_login"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/ghost"
-            android:onClick="login"
-            android:text="@string/login"
-            tools:ignore="UsingOnClickInXml" />
+            android:layout_height="50sp"
+            android:layout_marginTop="20sp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_login"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/ghost"
+                android:onClick="login"
+                android:text="@string/login"
+                android:textColor="@color/raisin"
+                tools:ignore="UsingOnClickInXml" />
+
+            <ProgressBar
+                android:id="@+id/pb_login"
+                android:layout_width="match_parent"
+                android:layout_height="30sp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/raisin"
+                android:visibility="gone" />
+
+        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/ll_toRegister"

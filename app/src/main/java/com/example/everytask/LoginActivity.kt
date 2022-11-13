@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.everytask.databinding.ActivityLoadingBinding
 import com.example.everytask.databinding.ActivityLoginBinding
 import com.example.everytask.models.Default
 import retrofit2.Call
@@ -15,24 +17,30 @@ import retrofit2.Response
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var loginBinding: ActivityLoginBinding
+    private lateinit var loadingBinding: ActivityLoadingBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         loginBinding = ActivityLoginBinding.inflate(layoutInflater)
+        loadingBinding = ActivityLoadingBinding.inflate(layoutInflater)
 
         sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
         editor = sharedPreferences.edit()
 
-        setContentView(loginBinding.root)
-
-        emailFocusListener(loginBinding.etEmail, loginBinding.tilEmailContainer)
+        setContentView(loadingBinding.root)
 
         if (sharedPreferences.getString("TOKEN", null) != null) {
+            //TODO show loading animation
             val token = sharedPreferences.getString("TOKEN", null)
             verifyToken(token!!)
+        }else {
+            setContentView(loginBinding.root)
+            emailFocusListener(loginBinding.etEmail, loginBinding.tilEmailContainer)
         }
+
+
     }
 
     private fun verifyToken(token: String) {
@@ -49,7 +57,10 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
             override fun onFailure(call: Call<Default>, t: Throwable) {
-                Log.d("verifyToken", "token not verified")
+                Toast.makeText(this@LoginActivity, "No connection to server", Toast.LENGTH_SHORT).show()
+                Log.d("TAG", "no response")
+                setContentView(loginBinding.root)
+                emailFocusListener(loginBinding.etEmail, loginBinding.tilEmailContainer)
             }
         })
     }
@@ -61,6 +72,10 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun login(view: View) {
+        loginBinding.btnLogin.isEnabled = false
+        loginBinding.btnLogin.text = ""
+        loginBinding.pbLogin.visibility = View.VISIBLE
+
         val validEmail = validEmail(loginBinding.etEmail.text.toString()) == null
 
         Log.d("LoginActivity", "login: $validEmail")
@@ -89,6 +104,10 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<Default>, t: Throwable) {
+                    Toast.makeText(this@LoginActivity, "No connection to server", Toast.LENGTH_SHORT).show()
+                    loginBinding.btnLogin.isEnabled = true
+                    loginBinding.btnLogin.text = getString(R.string.login)
+                    loginBinding.pbLogin.visibility = View.GONE
                     Log.d("TAG", t.message.toString())
                 }
             })

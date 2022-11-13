@@ -11,7 +11,7 @@ import com.google.gson.reflect.TypeToken
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-internal var BASE_URL = "http://192.168.0.68:8000/api/"
+internal var BASE_URL = "http://192.168.0.69:8000/api/"
 
 internal var retrofitBuilder = Retrofit.Builder()
     .baseUrl(BASE_URL)
@@ -26,7 +26,6 @@ internal lateinit var sharedPreferences: SharedPreferences
 internal lateinit var editor: SharedPreferences.Editor
 
 internal fun confirmPasswordFocusListener(tilConfirmPasswordContainer: TextInputLayout, etConfirmPassword: TextInputEditText, etPassword: TextInputEditText) {
-    // TODO : ERROR MAYBE?? statt helperText
     etConfirmPassword.setOnFocusChangeListener { _, focused ->
         if (!focused) {
             if (etPassword.text.toString() != etConfirmPassword.text.toString()) {
@@ -40,7 +39,6 @@ internal fun confirmPasswordFocusListener(tilConfirmPasswordContainer: TextInput
 }
 
 internal fun emailFocusListener(etEmail: TextInputEditText, tilEmailContainer: TextInputLayout) {
-    // TODO : ERROR MAYBE?? statt helperText
     etEmail.setOnFocusChangeListener { _, focused ->
         if (!focused) {
             tilEmailContainer.helperText = validEmail(etEmail.text.toString())
@@ -54,7 +52,6 @@ internal fun passwordFocusListener(
     tilConfirmPasswordContainer: TextInputLayout? = null,
     etConfirmPassword: TextInputEditText? = null
 ) {
-    // TODO : ERROR MAYBE?? statt helperText
     etPassword.setOnFocusChangeListener { _, focused ->
         if (!focused) {
             tilPasswordContainer.helperText = validPassword(etPassword.text.toString())
@@ -68,6 +65,22 @@ internal fun passwordFocusListener(
             }
         }
         Log.d("TAG", "passwordFocusListener: ${validPassword(etPassword.text.toString())}")
+    }
+}
+
+internal fun usernameFocusListener(etUsername: TextInputEditText, tilUsernameContainer: TextInputLayout) {
+    etUsername.setOnFocusChangeListener { _, focused ->
+        if (!focused) {
+            tilUsernameContainer.helperText = validUsername(etUsername.text.toString())
+        }
+    }
+}
+
+fun validUsername(username: String): String? {
+    return if (username.isEmpty()) {
+        "Username cannot be empty"
+    } else {
+        null
     }
 }
 
