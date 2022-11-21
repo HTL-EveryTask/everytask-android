@@ -1,8 +1,10 @@
 package com.example.everytask
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -11,17 +13,22 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
 import com.example.everytask.databinding.ActivityAddBinding
+import com.example.everytask.databinding.ActivityEditBinding
 import com.example.everytask.models.Task
+import com.example.everytask.models.call.TaskInfo
 import com.example.everytask.models.response.Default
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.Serializable
 import java.util.*
 
-class AddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
+class EditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
 
     private lateinit var TOKEN: String
+
+    private lateinit var task: Task
 
     var day = 0
     var month = 0
@@ -35,30 +42,36 @@ class AddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
     var savedHour = 0
     var savedMinute = 0
 
-    private lateinit var addBinding: ActivityAddBinding
+    private lateinit var editBinding: ActivityEditBinding
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        addBinding = ActivityAddBinding.inflate(layoutInflater)
+        editBinding = ActivityEditBinding.inflate(layoutInflater)
 
         TOKEN = sharedPreferences.getString("TOKEN", null)!!
 
-        setContentView(addBinding.root)
+        setContentView(editBinding.root)
 
         val actionbar = supportActionBar!!
-        actionbar.title = "Add Task"
+        actionbar.title = "Edit Task"
         actionbar.setDisplayHomeAsUpEnabled(true)
 
         pickDate()
 
-        getDateTimeCalendar()
-        savedDay = day
-        savedMonth = month
-        savedYear = year
-        savedHour = hour
-        savedMinute = minute
-        addBinding.editTask.etDueDate.setText("$savedYear-$savedMonth-$savedDay $savedHour:$savedMinute:00")
+        //set all the values
+        task = getSerializable(this, "TASK",Task::class.java)
+        editBinding.editTask.etTitle.setText(task.title)
+        editBinding.editTask.etDescription.setText(task.description)
+        editBinding.editTask.etDueDate.setText(task.due_time)
+    }
+
+    fun <T : Serializable?> getSerializable(activity: Activity, name: String, clazz: Class<T>): T
+    {
+        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            activity.intent.getSerializableExtra(name, clazz)!!
+        else
+            activity.intent.getSerializableExtra(name) as T
     }
 
     private fun getDateTimeCalendar() {
@@ -71,7 +84,7 @@ class AddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
     }
 
     private fun pickDate() {
-        addBinding.editTask.etDueDate.setOnClickListener {
+        editBinding.editTask.etDueDate.setOnClickListener {
             getDateTimeCalendar()
             DatePickerDialog(this, this, year, month, day).show()
         }
@@ -97,20 +110,20 @@ class AddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
         savedHour = hourOfDay
         savedMinute = minute
-        addBinding.editTask.etDueDate.setText("$savedDay/$savedMonth/$savedYear $savedHour:$savedMinute")
+        editBinding.editTask.etDueDate.setText("$savedDay/$savedMonth/$savedYear $savedHour:$savedMinute")
     }
 
-    fun addTask(view: View) {
-        val title = addBinding.editTask.etTitle.text.toString()
-        val description = addBinding.editTask.etDescription.text.toString()
+    fun updateTask(view: View) {
+        val title = editBinding.editTask.etTitle.text.toString()
+        val description = editBinding.editTask.etDescription.text.toString()
         val dueDate = "$savedYear-$savedMonth-$savedDay $savedHour:$savedMinute:00"
 
         if (title.isEmpty()) {
-            addBinding.editTask.etTitle.error = "Title cannot be empty"
+            editBinding.editTask.etTitle.error = "Title cannot be empty"
             return
         }
-        val call = retrofitBuilder.addTask(TOKEN, Task(title, description, dueDate))
-        Log.d("TAG", "addTask: ${Task(title, description, dueDate)}")
+        val call = retrofitBuilder.updateTask(TOKEN, Task(title, description, dueDate, task.id))
+        Log.d("TAG", "editTask: ${Task(title, description, dueDate)}")
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
                 if (response.isSuccessful) {
@@ -120,10 +133,14 @@ class AddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
             }
 
             override fun onFailure(call: Call<Default>, t: Throwable) {
-                Toast.makeText(this@AddActivity, "No connection to server", Toast.LENGTH_SHORT)
+                Toast.makeText(this@EditActivity, "No connection to server", Toast.LENGTH_SHORT)
                     .show()
                 Log.d("TAG", t.message.toString())
             }
         })
+    }
+
+    fun cancelTask(view: View) {
+        finish()
     }
 }

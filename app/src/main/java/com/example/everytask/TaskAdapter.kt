@@ -1,7 +1,9 @@
 package com.example.everytask
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.everytask.databinding.RowTasksBinding
 import com.example.everytask.fragments.HomeFragment
@@ -20,16 +22,19 @@ class TaskAdapter(val taskList: List<Task>, val homeFragment: HomeFragment): Rec
         fun bind(task: Task){
             tasksBinding.tvTaskTitle.text = task.title
             tasksBinding.tvTaskDescription.text = task.due_time
+            checked[adapterPosition] = task.is_done!!.toBoolean()
             tasksBinding.cbDone.isChecked = checked[adapterPosition]
             tasksBinding.cbDone.setOnCheckedChangeListener { buttonView, isChecked ->
                 checked[adapterPosition] = isChecked
+                homeFragment.toggleDone(task.id!!, isChecked)
             }
             tasksBinding.flBtnDeleteContainer.setOnClickListener {
                 homeFragment.showDeleteAlert(task)
             }
             tasksBinding.clTaskContainer.setOnClickListener {
-                /*val intent = Intent(homeFragment.context, EditActivity::class.java)
-                startActivity(homeFragment.requireContext(), intent, null)*/
+                val intent = Intent(homeFragment.requireContext(), EditActivity::class.java)
+                intent.putExtra("TASK", task)
+                startActivity(homeFragment.requireContext(), intent, null)
             }
         }
     }

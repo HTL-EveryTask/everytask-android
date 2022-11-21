@@ -9,10 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.everytask.databinding.ActivityLoadingBinding
 import com.example.everytask.databinding.ActivityLoginBinding
-import com.example.everytask.models.Default
+import com.example.everytask.models.call.LoginInfo
+import com.example.everytask.models.response.Default
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
 
 class LoginActivity : AppCompatActivity() {
 
@@ -54,6 +56,8 @@ class LoginActivity : AppCompatActivity() {
                     val errorResponse: Default? =
                         gson.fromJson(response.errorBody()!!.charStream(), type)
                     Log.d("TAG", "onResponse: $errorResponse")
+                    sharedPreferences.edit().remove("TOKEN").apply()
+                    setContentView(loginBinding.root)
                 }
             }
             override fun onFailure(call: Call<Default>, t: Throwable) {
@@ -81,8 +85,10 @@ class LoginActivity : AppCompatActivity() {
         Log.d("LoginActivity", "login: $validEmail")
         if (validEmail) {
             val retrofitData = retrofitBuilder.loginUser(
-                loginBinding.etEmail.text.toString(),
-                loginBinding.etPassword.text.toString()
+                LoginInfo(
+                    loginBinding.etEmail.text.toString(),
+                    loginBinding.etPassword.text.toString()
+                )
             )
 
             retrofitData.enqueue(object : Callback<Default> {
@@ -95,11 +101,12 @@ class LoginActivity : AppCompatActivity() {
                         }.apply()
                         loginRedirect()
                     } else {
-                        val errorResponse: Default? =
-                            gson.fromJson(response.errorBody()!!.charStream(), type)
-                        Log.d("TAG", "onResponse: $errorResponse")
+                        Log.d("TAG", "onResponse:${response.errorBody().toString()}")
                         loginBinding.tilEmailContainer.error = "Invalid email or password"
                         loginBinding.tilPasswordContainer.error = "Invalid email or password"
+                        loginBinding.btnLogin.isEnabled = true
+                        loginBinding.btnLogin.text = getString(R.string.login)
+                        loginBinding.pbLogin.visibility = View.GONE
                     }
                 }
 

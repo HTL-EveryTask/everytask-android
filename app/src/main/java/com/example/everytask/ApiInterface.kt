@@ -1,51 +1,58 @@
 package com.example.everytask
 
-import com.example.everytask.models.Default
+import com.example.everytask.models.Task
+import com.example.everytask.models.call.LoginInfo
+import com.example.everytask.models.call.RegisterInfo
+import com.example.everytask.models.call.TaskInfo
+import com.example.everytask.models.response.Default
 import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface ApiInterface {
 
-    @GET("register_user")
+    @PUT("register_user")
     fun registerUser(
-        @Query("username") name: String,
-        @Query("email") email: String,
-        @Query("password") password: String,
-        @Query("is_teacher") is_teacher: Boolean?
+        @Body registerInfo: RegisterInfo
     ): Call<Default>
 
-    @GET("login_user")
+    @POST("login_user")
     fun loginUser(
-        @Query("email") email: String,
-        @Query("password") password: String
+        @Body loginIngo: LoginInfo
     ): Call<Default>
 
-    @POST("task/get")
+    @GET("tasks")
     fun getTasks(
-        @Query("token") token: String
+        @Header("Authorization") token: String
     ): Call<Default>
 
-    @POST("task/add")
+    @PUT("task")
     fun addTask(
-        @Query("token") token: String,
-        @Query("title") title: String,
-        @Query("description") description: String,
-        @Query("due_time") due_time: String?,
-        @Query("note") note: String?,
-        @Query("group_id") group_id: Int?,
+        @Header("Authorization") token: String,
+        @Body task: Task
     ): Call<Default>
 
-    @POST("task/remove/{task_id}")
+    //in body only id of task as int
+    @HTTP(method = "DELETE", path = "task/{id}", hasBody = true)
     fun deleteTask(
-        @Path("task_id") id: String,
-        @Query("token") token: String
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
     ): Call<Default>
 
-    @POST("token/{token}")
+    @POST("token")
     fun verifyToken(
-        @Path("token") token: String
+        @Header("Authorization") token: String
+    ): Call<Default>
+
+    @PATCH("task/{id}/done")
+    fun toggleDone(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body body: Map<String,Boolean>
+    ): Call<Default>
+
+    @PATCH("task")
+    fun updateTask(
+        @Header("Authorization") token: String,
+        @Body task: Task
     ): Call<Default>
 }

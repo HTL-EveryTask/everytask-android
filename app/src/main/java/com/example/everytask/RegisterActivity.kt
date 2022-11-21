@@ -8,7 +8,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.everytask.databinding.ActivityRegisterBinding
-import com.example.everytask.models.Default
+import com.example.everytask.models.call.RegisterInfo
+import com.example.everytask.models.response.Default
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,6 +23,8 @@ class RegisterActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         registerBinding = ActivityRegisterBinding.inflate(layoutInflater)
+
+        sharedPreferences.edit().remove("TOKEN").apply()
 
         setContentView(registerBinding.root)
         emailFocusListener(registerBinding.etEmail, registerBinding.tilEmailContainer)
@@ -64,14 +67,17 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         if (validEmail && validPassword && validConfirmPassword && username.isNotEmpty()) {
+
             val retrofitData = retrofitBuilder.registerUser(
-                registerBinding.etUsername.text.toString(),
-                registerBinding.etEmail.text.toString(),
-                registerBinding.etPassword.text.toString(),
-                false
+                RegisterInfo(
+                    username,
+                    registerBinding.etPassword.text.toString(),
+                    registerBinding.etEmail.text.toString(),
+                    false
+                )
             )
 
-            Log.d("TAG", "register: $retrofitBuilder")
+            Log.d("TAG", "register: $retrofitData")
 
             retrofitData.enqueue(object : Callback<Default> {
                 override fun onResponse(
@@ -88,8 +94,10 @@ class RegisterActivity : AppCompatActivity() {
                         startActivity(intent)
                         this@RegisterActivity.overridePendingTransition(0, 0)
                     } else {
-                        Log.d("TAG", "onResponse: ${response.errorBody()}")
                         registerBinding.tilEmailContainer.error = "Email already exists"
+                        registerBinding.btnRegister.isEnabled = true
+                        registerBinding.btnRegister.text = getString(R.string.register)
+                        registerBinding.pbRegister.visibility = View.GONE
                     }
                 }
 

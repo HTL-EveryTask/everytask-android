@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.everytask.*
 import com.example.everytask.databinding.FragmentHomeBinding
-import com.example.everytask.models.Default
+import com.example.everytask.models.response.Default
 import com.example.everytask.models.Task
 import com.example.everytask.sharedPreferences
 import retrofit2.Call
@@ -56,8 +56,8 @@ class HomeFragment : Fragment() {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
                 if (response.isSuccessful) {
                     val default = response.body()
-                    val tasks = default?.data
-
+                    val tasks = default?.tasks
+                    Log.d("TAG", "onResponse: ${response.body()}")
                     if (tasks != null) {
                         val adapter = TaskAdapter(tasks, homeFragment)
                         try {
@@ -80,17 +80,16 @@ class HomeFragment : Fragment() {
         })
     }
 
-    fun deleteTask(task: Task) {
-        val call = retrofitBuilder.deleteTask(task.id, TOKEN)
+    private fun deleteTask(task: Task) {
+        val call = retrofitBuilder.deleteTask(TOKEN, task.id!!)
+        Log.d("TAG", "deleteTask: $TOKEN ${task.id}")
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
                 if (response.isSuccessful) {
                     Log.d("TAG", "onResponse: ${response.body()}")
                     getTasks()
                 } else {
-                    val errorResponse: Default? =
-                        gson.fromJson(response.errorBody()!!.charStream(), type)
-                    Log.d("TAG", "onResponse: $errorResponse")
+                    Log.d("TAG", "onResponse: ${response.body()}")
                 }
             }
 
@@ -122,5 +121,23 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         getTasks()
+    }
+
+    fun toggleDone(id: Int, checked: Boolean) {
+        val call = retrofitBuilder.toggleDone(TOKEN, id, mapOf("is_done" to checked))
+        call.enqueue(object : Callback<Default> {
+            override fun onResponse(call: Call<Default>, response: Response<Default>) {
+                if (response.isSuccessful) {
+                    Log.d("TAG", "onResponse: ${response.body()}")
+                } else {
+                    Log.d("TAG", "onResponse: ${response.body()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Default>, t: Throwable) {
+                Toast.makeText(context, "No connection to server", Toast.LENGTH_SHORT).show()
+                Log.d("TAG", "onFailure: ${t.message}")
+            }
+        })
     }
 }

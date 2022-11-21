@@ -17,8 +17,8 @@
     <string name="login_title">Login to &appname;</string>
     <string name="have_no_account">Need an account?</string>
     <string name="usernameMock">test1</string>
-    <string name="emailMock">8082@htl.rennweg.at</string>
-    <string name="passwordMock">Password_1</string>
+    <string name="emailMock">user1@everytask.at</string>
+    <string name="passwordMock">password1</string>
     <string name="addtask">addTask</string>
     <string name="back">Back</string>
     <string name="add_task">Add Task</string>
@@ -27,4 +27,5 @@
     <string name="dueDate">Due</string>
     <string name="save">Save</string>
     <string name="logout">Logout</string>
+    <string name="cancel">Cancel</string>
 </resources>

@@ -3,7 +3,7 @@ package com.example.everytask
 import android.content.SharedPreferences
 import android.util.Log
 import android.util.Patterns
-import com.example.everytask.models.Default
+import com.example.everytask.models.response.Default
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
@@ -104,3 +104,5 @@ internal fun validEmail(email: String): String? {
         else -> null
     }
 }
+
+internal fun Int.toBoolean() = this == 1
