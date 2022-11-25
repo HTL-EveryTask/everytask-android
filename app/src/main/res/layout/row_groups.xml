@@ -10,38 +10,37 @@
     android:layout_margin="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_taskContainer"
+        android:id="@+id/cl_groupContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/cb_done"
+        <ImageView
+            android:id="@+id/iv_groupIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="18dp"
             android:layout_gravity="center_vertical"
-            android:button="@drawable/custom_checkbox"
-            android:buttonTint="@color/raisin"
+            android:src="@drawable/ic_baseline_groups_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:padding="8dp"/>
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/ll_taskTextContainer"
+            android:id="@+id/ll_groupTextContainer"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
             android:gravity="center_vertical"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/fl_btnDeleteContainer"
-            app:layout_constraintStart_toEndOf="@id/cb_done"
+            app:layout_constraintEnd_toStartOf="@id/ll_membersContainer"
+            app:layout_constraintStart_toEndOf="@id/iv_groupIcon"
             app:layout_constraintTop_toTopOf="parent">
 
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_taskTitle"
+                android:id="@+id/tv_groupName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -51,7 +50,7 @@
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_taskDescription"
+                android:id="@+id/tv_groupDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -63,26 +62,36 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
 
 
-        <FrameLayout
-            android:id="@+id/fl_btnDeleteContainer"
+        <LinearLayout
+            android:id="@+id/ll_membersContainer"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            app:layout_constraintLeft_toRightOf="@id/ll_taskTextContainer"
+            android:layout_height="match_parent"
+            app:layout_constraintLeft_toRightOf="@id/ll_groupTextContainer"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:padding="16dp">
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/btn_delete"
+            <ImageView
+                android:id="@+id/iv_member1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:background="@drawable/ic_baseline_delete_24"
-                android:clickable="false"
-                android:focusable="false"/>
+                android:src="@drawable/ic_baseline_groups_24"
+                android:padding="8dp"
+                app:tint="@color/raisin" />
 
-        </FrameLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:id="@+id/tv_memberCount"
+                android:text="5"
+                android:textColor="@color/raisin"
+                android:textSize="15sp"
+                android:gravity="center"/>
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

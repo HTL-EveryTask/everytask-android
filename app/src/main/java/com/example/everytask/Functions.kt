@@ -90,9 +90,7 @@ internal fun validPassword(password: String): String? {
         password.length < 8 -> "Password must be at least 8 characters"
         //TODO Matching regex checken
         !password.matches(".*[a-z].*".toRegex()) -> "Password must contain at least one lowercase letter"
-        !password.matches(".*[A-Z].*".toRegex()) -> "Password must contain at least one uppercase letter"
         !password.matches(".*[0-9].*".toRegex()) -> "Password must contain at least one number"
-        !password.matches(".*[!@#\$%^&*()_+].*".toRegex()) -> "Password must contain at least one special character"
         else -> null
     }
 }

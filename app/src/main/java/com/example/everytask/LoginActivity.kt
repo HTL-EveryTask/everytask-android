@@ -53,9 +53,6 @@ class LoginActivity : AppCompatActivity() {
                     Log.d("TAG", "onResponse: ${response.body()}")
                     loginRedirect()
                 } else {
-                    val errorResponse: Default? =
-                        gson.fromJson(response.errorBody()!!.charStream(), type)
-                    Log.d("TAG", "onResponse: $errorResponse")
                     sharedPreferences.edit().remove("TOKEN").apply()
                     setContentView(loginBinding.root)
                 }

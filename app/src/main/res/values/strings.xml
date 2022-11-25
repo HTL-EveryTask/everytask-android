@@ -28,4 +28,7 @@
     <string name="save">Save</string>
     <string name="logout">Logout</string>
     <string name="cancel">Cancel</string>
+    <string name="resend_mail">Resend Verification Mail</string>
+    <string name="mail_sent">Verification Mail sent</string>
+    <string name="verification_text">Please check your inbox and click on the link in the verification mail to verify your account.</string>
 </resources>

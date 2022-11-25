@@ -22,7 +22,7 @@ class TaskAdapter(val taskList: List<Task>, val homeFragment: HomeFragment): Rec
         fun bind(task: Task){
             tasksBinding.tvTaskTitle.text = task.title
             tasksBinding.tvTaskDescription.text = task.due_time
-            checked[adapterPosition] = task.is_done!!.toBoolean()
+            checked[adapterPosition] = task.is_done!!
             tasksBinding.cbDone.isChecked = checked[adapterPosition]
             tasksBinding.cbDone.setOnCheckedChangeListener { buttonView, isChecked ->
                 checked[adapterPosition] = isChecked
@@ -31,7 +31,7 @@ class TaskAdapter(val taskList: List<Task>, val homeFragment: HomeFragment): Rec
             tasksBinding.flBtnDeleteContainer.setOnClickListener {
                 homeFragment.showDeleteAlert(task)
             }
-            tasksBinding.clTaskContainer.setOnClickListener {
+            tasksBinding.llTaskTextContainer.setOnClickListener {
                 val intent = Intent(homeFragment.requireContext(), EditActivity::class.java)
                 intent.putExtra("TASK", task)
                 startActivity(homeFragment.requireContext(), intent, null)

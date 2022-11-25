@@ -12,10 +12,8 @@ import android.view.View
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
-import com.example.everytask.databinding.ActivityAddBinding
 import com.example.everytask.databinding.ActivityEditBinding
 import com.example.everytask.models.Task
-import com.example.everytask.models.call.TaskInfo
 import com.example.everytask.models.response.Default
 import retrofit2.Call
 import retrofit2.Callback
@@ -122,13 +120,17 @@ class EditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
             editBinding.editTask.etTitle.error = "Title cannot be empty"
             return
         }
-        val call = retrofitBuilder.updateTask(TOKEN, Task(title, description, dueDate, task.id))
+        val call = retrofitBuilder.updateTask(TOKEN,
+            task.id!!,Task(title, description, dueDate, task.id))
         Log.d("TAG", "editTask: ${Task(title, description, dueDate)}")
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
                 if (response.isSuccessful) {
                     Log.d("TAG", "onResponse: ${response.body()}")
                     finish()
+                } else {
+                    Log.d("TAG", "onResponse: ${response.errorBody()}")
+                    Toast.makeText(this@EditActivity, "You are not the creator of this Task", Toast.LENGTH_SHORT).show()
                 }
             }
 
