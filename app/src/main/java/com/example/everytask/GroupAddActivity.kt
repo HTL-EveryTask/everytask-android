@@ -79,6 +79,7 @@ class GroupAddActivity : AppCompatActivity() {
                                 val body = response.body()
                                 val inviteLink = body?.key
                                 binding.etInviteLink.setText(inviteLink)
+                                binding.btnCreate.isClickable = true
                             } else {
                                 Log.d("TAG", "onResponse: ${response.errorBody()}")
                             }

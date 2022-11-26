@@ -119,6 +119,7 @@
             android:backgroundTint="@color/ghost"
             android:onClick="addGroup"
             android:text="@string/createGroup"
+            android:clickable="false"
             android:textColor="@color/raisin"
             tools:ignore="UsingOnClickInXml" />
     </LinearLayout>

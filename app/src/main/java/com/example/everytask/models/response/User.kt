@@ -7,4 +7,4 @@ data class User(
     val is_teacher: Boolean,
     val token: String,
     val username: String
-)
+) : java.io.Serializable

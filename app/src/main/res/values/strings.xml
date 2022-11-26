@@ -36,4 +36,5 @@
     <string name="inviteLinkText">Invite your Colleagues to join your group</string>
     <string name="copy">Copy</string>
     <string name="generate">Generate</string>
+    <string name="leave">Leave</string>
 </resources>

@@ -24,9 +24,9 @@ class GroupAdapter(val groupList: List<Group>, val groupsFragment: GroupsFragmen
             groupsBinding.tvGroupDescription.text = group.description
             groupsBinding.tvMemberCount.text = group.stats.total_users.toString()
             groupsBinding.llGroupTextContainer.setOnClickListener {
-//                val intent = Intent(homeFragment.requireContext(), EditActivity::class.java)
-//                intent.putExtra("TASK", task)
-//                startActivity(homeFragment.requireContext(), intent, null)
+                val intent = Intent(groupsFragment.requireContext(), GroupEditActivity::class.java)
+                intent.putExtra("GROUP", group)
+                startActivity(groupsFragment.requireContext(), intent, null)
             }
         }
     }

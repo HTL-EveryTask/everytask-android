@@ -1,6 +1,8 @@
 package com.example.everytask
 
+import android.app.Activity
 import android.content.SharedPreferences
+import android.os.Build
 import android.util.Log
 import android.util.Patterns
 import com.example.everytask.models.response.Default
@@ -10,6 +12,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.Serializable
 
 internal var BASE_URL = "http://192.168.0.69:8000/api/"
 
@@ -104,3 +107,11 @@ internal fun validEmail(email: String): String? {
 }
 
 internal fun Int.toBoolean() = this == 1
+
+fun <T : Serializable?> getSerializable(activity: Activity, name: String, clazz: Class<T>): T
+{
+    return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        activity.intent.getSerializableExtra(name, clazz)!!
+    else
+        activity.intent.getSerializableExtra(name) as T
+}

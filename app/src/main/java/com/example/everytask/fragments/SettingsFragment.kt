@@ -86,7 +86,7 @@ class SettingsFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<Default>, t: Throwable) {
-                Toast.makeText(requireContext(), "Username not changed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "No connection to server", Toast.LENGTH_SHORT).show()
             }
         })
     }
