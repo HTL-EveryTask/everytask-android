@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.everytask.*
 import com.example.everytask.databinding.FragmentGroupsBinding
-import com.example.everytask.databinding.FragmentHomeBinding
 import com.example.everytask.models.response.Default
 import com.example.everytask.retrofitBuilder
 import com.example.everytask.sharedPreferences
@@ -43,7 +42,7 @@ class GroupsFragment : Fragment() {
         }
 
         binding.fabAddGroup.setOnClickListener {
-            val intent = Intent(requireContext(), AddActivity::class.java)
+            val intent = Intent(requireContext(), GroupAddActivity::class.java)
             startActivity(intent)
         }
 

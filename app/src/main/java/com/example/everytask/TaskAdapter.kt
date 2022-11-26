@@ -32,7 +32,7 @@ class TaskAdapter(val taskList: List<Task>, val homeFragment: HomeFragment): Rec
                 homeFragment.showDeleteAlert(task)
             }
             tasksBinding.llTaskTextContainer.setOnClickListener {
-                val intent = Intent(homeFragment.requireContext(), EditActivity::class.java)
+                val intent = Intent(homeFragment.requireContext(), TaskEditActivity::class.java)
                 intent.putExtra("TASK", task)
                 startActivity(homeFragment.requireContext(), intent, null)
             }

@@ -43,7 +43,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.fabAddTask.setOnClickListener {
-            val intent = Intent(requireContext(), AddActivity::class.java)
+            val intent = Intent(requireContext(), TaskAddActivity::class.java)
             startActivity(intent)
         }
 

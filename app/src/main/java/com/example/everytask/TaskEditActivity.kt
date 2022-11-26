@@ -12,7 +12,7 @@ import android.view.View
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
-import com.example.everytask.databinding.ActivityEditBinding
+import com.example.everytask.databinding.ActivityTaskEditBinding
 import com.example.everytask.models.Task
 import com.example.everytask.models.response.Default
 import retrofit2.Call
@@ -21,7 +21,7 @@ import retrofit2.Response
 import java.io.Serializable
 import java.util.*
 
-class EditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
+class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
 
     private lateinit var TOKEN: String
@@ -40,12 +40,12 @@ class EditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
     var savedHour = 0
     var savedMinute = 0
 
-    private lateinit var editBinding: ActivityEditBinding
+    private lateinit var editBinding: ActivityTaskEditBinding
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        editBinding = ActivityEditBinding.inflate(layoutInflater)
+        editBinding = ActivityTaskEditBinding.inflate(layoutInflater)
 
         TOKEN = sharedPreferences.getString("TOKEN", null)!!
 
@@ -130,12 +130,12 @@ class EditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
                     finish()
                 } else {
                     Log.d("TAG", "onResponse: ${response.errorBody()}")
-                    Toast.makeText(this@EditActivity, "You are not the creator of this Task", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@TaskEditActivity, "You are not the creator of this Task", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<Default>, t: Throwable) {
-                Toast.makeText(this@EditActivity, "No connection to server", Toast.LENGTH_SHORT)
+                Toast.makeText(this@TaskEditActivity, "No connection to server", Toast.LENGTH_SHORT)
                     .show()
                 Log.d("TAG", t.message.toString())
             }

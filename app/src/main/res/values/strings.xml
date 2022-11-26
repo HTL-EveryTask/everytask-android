@@ -31,4 +31,9 @@
     <string name="resend_mail">Resend Verification Mail</string>
     <string name="mail_sent">Verification Mail sent</string>
     <string name="verification_text">Please check your inbox and click on the link in the verification mail to verify your account.</string>
+    <string name="name">Name</string>
+    <string name="createGroup">Create Group</string>
+    <string name="inviteLinkText">Invite your Colleagues to join your group</string>
+    <string name="copy">Copy</string>
+    <string name="generate">Generate</string>
 </resources>

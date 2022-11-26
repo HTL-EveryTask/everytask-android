@@ -1,11 +1,9 @@
 package com.example.everytask
 
 import com.example.everytask.models.Task
-import com.example.everytask.models.call.LoginInfo
-import com.example.everytask.models.call.RegisterInfo
-import com.example.everytask.models.call.TaskInfo
-import com.example.everytask.models.call.UntisInfo
+import com.example.everytask.models.call.*
 import com.example.everytask.models.response.Default
+import com.example.everytask.models.response.groups.Group
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -31,7 +29,7 @@ interface ApiInterface {
     @PATCH("user")
     fun changeUsername(
         @Header("Authorization") token: String,
-        @Body username: String
+        @Body body: Map<String,String>
     ): Call<Default>
 
     @GET("user")
@@ -99,7 +97,7 @@ interface ApiInterface {
     @PUT("group")
     fun addGroup(
         @Header("Authorization") token: String,
-        @Body body: Map<String,String>
+        @Body body: GroupInfo
     ): Call<Default>
 
     @POST("group/{id}/invite")
