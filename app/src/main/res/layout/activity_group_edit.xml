@@ -1,85 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".GroupEditActivity">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/ll_loginContainer"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="30sp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        tools:context=".GroupEditActivity">
 
-        <include layout="@layout/edit_group" android:id="@+id/edit_group"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_members"
+        <LinearLayout
+            android:id="@+id/ll_loginContainer"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/row_members"/>
-
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="20sp"
-            android:layout_marginEnd="20sp"
-            android:layout_marginBottom="20sp"
-            android:orientation="horizontal">
+            android:layout_marginHorizontal="30sp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_save"
+            <include
+                android:id="@+id/edit_group"
+                layout="@layout/edit_group" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_members"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/row_members" />
+
+            <LinearLayout
+                android:id="@+id/ll_inviteLinks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10sp"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10sp"
+                    android:layout_marginBottom="20sp"
+                    android:background="@color/raisin" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/inviteLinkText"
+                    android:textColor="@color/raisin" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_generate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginEnd="20sp"
+                    android:backgroundTint="@color/ghost"
+                    android:onClick="generateInviteLink"
+                    android:text="@string/generate"
+                    android:textColor="@color/raisin"
+                    tools:ignore="UsingOnClickInXml" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_inviteContainer"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/btn_copy"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_inviteLink"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:inputType="none"
+                            android:maxLines="1"
+                            android:textIsSelectable="true"
+                            tools:ignore="RtlSymmetry" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_copy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="20sp"
+                        android:backgroundTint="@color/ghost"
+                        android:onClick="copyInviteLink"
+                        android:text="@string/copy"
+                        android:textColor="@color/raisin"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/til_inviteContainer"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="UsingOnClickInXml" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_marginTop="8sp"
-                android:layout_marginEnd="8sp"
+                android:layout_marginTop="20sp"
+                android:layout_marginEnd="20sp"
                 android:layout_marginBottom="20sp"
-                android:backgroundTint="@color/ghost"
-                android:onClick="updateGroup"
-                android:text="@string/save"
-                android:textColor="@color/raisin"
-                tools:ignore="UsingOnClickInXml" />
+                android:orientation="horizontal">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginTop="10sp"
-                android:layout_marginEnd="8sp"
-                android:layout_marginBottom="20sp"
-                android:backgroundTint="@color/red"
-                android:onClick="cancelGroup"
-                android:text="@string/cancel"
-                android:textColor="@color/platinum"
-                tools:ignore="UsingOnClickInXml" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_save"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="8sp"
+                    android:layout_marginEnd="8sp"
+                    android:layout_marginBottom="20sp"
+                    android:backgroundTint="@color/ghost"
+                    android:onClick="updateGroup"
+                    android:text="@string/save"
+                    android:textColor="@color/raisin"
+                    tools:ignore="UsingOnClickInXml" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_leave"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginTop="10sp"
-                android:layout_marginBottom="20sp"
-                android:backgroundTint="@color/red"
-                android:onClick="showLeaveAlert"
-                android:text="@string/leave"
-                android:textColor="@color/platinum"
-                tools:ignore="UsingOnClickInXml" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="10sp"
+                    android:layout_marginEnd="8sp"
+                    android:layout_marginBottom="20sp"
+                    android:backgroundTint="@color/red"
+                    android:onClick="cancelGroup"
+                    android:text="@string/cancel"
+                    android:textColor="@color/platinum"
+                    tools:ignore="UsingOnClickInXml" />
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_leave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="10sp"
+                    android:layout_marginBottom="20sp"
+                    android:backgroundTint="@color/red"
+                    android:onClick="showLeaveAlert"
+                    android:text="@string/leave"
+                    android:textColor="@color/platinum"
+                    tools:ignore="UsingOnClickInXml" />
 
-    </LinearLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

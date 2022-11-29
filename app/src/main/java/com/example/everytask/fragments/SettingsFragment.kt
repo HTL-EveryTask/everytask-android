@@ -74,6 +74,14 @@ class SettingsFragment : Fragment() {
     }
 
     fun editUsername() {
+        if (binding.etUsername.text!!.isEmpty()) {
+            binding.etUsername.error = "Username cannot be empty"
+            return
+        }
+        if (binding.etUsername.text!!.length > 32) {
+            binding.etUsername.error = "Username is too long"
+            return
+        }
         var call = retrofitBuilder.changeUsername(TOKEN, mapOf("username" to binding.etUsername.text.toString()))
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {

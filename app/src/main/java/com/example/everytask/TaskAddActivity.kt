@@ -109,6 +109,14 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
             binding.editTask.etTitle.error = "Title cannot be empty"
             return
         }
+        if (title.length > 32) {
+            binding.editTask.etTitle.error = "Title cannot be longer than 32 characters"
+            return
+        }
+        if (description.length > 300) {
+            binding.editTask.etDescription.error = "Description cannot be longer than 300 characters"
+            return
+        }
         val call = retrofitBuilder.addTask(TOKEN, Task(title, description, dueDate))
         Log.d("TAG", "addTask: ${Task(title, description, dueDate)}")
         call.enqueue(object : Callback<Default> {

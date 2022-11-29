@@ -1,10 +1,8 @@
 package com.example.everytask
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -18,7 +16,6 @@ import com.example.everytask.models.response.Default
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.Serializable
 import java.util.*
 
 class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
@@ -40,16 +37,16 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     var savedHour = 0
     var savedMinute = 0
 
-    private lateinit var editBinding: ActivityTaskEditBinding
+    private lateinit var binding: ActivityTaskEditBinding
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        editBinding = ActivityTaskEditBinding.inflate(layoutInflater)
+        binding = ActivityTaskEditBinding.inflate(layoutInflater)
 
         TOKEN = sharedPreferences.getString("TOKEN", null)!!
 
-        setContentView(editBinding.root)
+        setContentView(binding.root)
 
         val actionbar = supportActionBar!!
         actionbar.title = "Edit Task"
@@ -59,9 +56,9 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
         //set all the values
         task = getSerializable(this, "TASK",Task::class.java)
-        editBinding.editTask.etTitle.setText(task.title)
-        editBinding.editTask.etDescription.setText(task.description)
-        editBinding.editTask.etDueDate.setText(task.due_time)
+        binding.editTask.etTitle.setText(task.title)
+        binding.editTask.etDescription.setText(task.description)
+        binding.editTask.etDueDate.setText(task.due_time)
     }
 
     private fun getDateTimeCalendar() {
@@ -74,7 +71,7 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     }
 
     private fun pickDate() {
-        editBinding.editTask.etDueDate.setOnClickListener {
+        binding.editTask.etDueDate.setOnClickListener {
             getDateTimeCalendar()
             DatePickerDialog(this, this, year, month, day).show()
         }
@@ -100,16 +97,24 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
         savedHour = hourOfDay
         savedMinute = minute
-        editBinding.editTask.etDueDate.setText("$savedDay/$savedMonth/$savedYear $savedHour:$savedMinute")
+        binding.editTask.etDueDate.setText("$savedDay/$savedMonth/$savedYear $savedHour:$savedMinute")
     }
 
     fun updateTask(view: View) {
-        val title = editBinding.editTask.etTitle.text.toString()
-        val description = editBinding.editTask.etDescription.text.toString()
+        val title = binding.editTask.etTitle.text.toString()
+        val description = binding.editTask.etDescription.text.toString()
         val dueDate = "$savedYear-$savedMonth-$savedDay $savedHour:$savedMinute:00"
 
         if (title.isEmpty()) {
-            editBinding.editTask.etTitle.error = "Title cannot be empty"
+            binding.editTask.etTitle.error = "Title cannot be empty"
+            return
+        }
+        if (title.length > 32) {
+            binding.editTask.etTitle.error = "Title cannot be longer than 32 characters"
+            return
+        }
+        if (description.length > 300) {
+            binding.editTask.etDescription.error = "Description cannot be longer than 300 characters"
             return
         }
         val call = retrofitBuilder.updateTask(TOKEN,
