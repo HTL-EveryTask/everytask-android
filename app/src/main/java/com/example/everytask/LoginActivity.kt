@@ -7,10 +7,12 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.everytask.databinding.ActivityForgotPasswordBinding
 import com.example.everytask.databinding.ActivityLoadingBinding
 import com.example.everytask.databinding.ActivityLoginBinding
 import com.example.everytask.models.call.LoginInfo
 import com.example.everytask.models.response.Default
+import com.google.android.material.textfield.TextInputEditText
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,6 +22,7 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var loginBinding: ActivityLoginBinding
     private lateinit var loadingBinding: ActivityLoadingBinding
+    private lateinit var forgotPasswordBinding: ActivityForgotPasswordBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
             //TODO show loading animation
             val token = sharedPreferences.getString("TOKEN", null)
             verifyToken(token!!)
-        }else {
+        } else {
             setContentView(loginBinding.root)
             emailFocusListener(loginBinding.etEmail, loginBinding.tilEmailContainer)
         }
@@ -57,8 +60,10 @@ class LoginActivity : AppCompatActivity() {
                     setContentView(loginBinding.root)
                 }
             }
+
             override fun onFailure(call: Call<Default>, t: Throwable) {
-                Toast.makeText(this@LoginActivity, "No connection to server", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "No connection to server", Toast.LENGTH_SHORT)
+                    .show()
                 Log.d("TAG", "no response")
                 setContentView(loginBinding.root)
                 emailFocusListener(loginBinding.etEmail, loginBinding.tilEmailContainer)
@@ -95,6 +100,7 @@ class LoginActivity : AppCompatActivity() {
                         Log.d("TAG", "loginRedirect: ${response.body()?.token}")
                         editor.apply {
                             putString("TOKEN", response.body()?.token)
+                            putString("USER_ID", response.body()?.user?.id.toString())
                         }.apply()
                         loginRedirect()
                     } else {
@@ -108,7 +114,11 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<Default>, t: Throwable) {
-                    Toast.makeText(this@LoginActivity, "No connection to server", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "No connection to server",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     loginBinding.btnLogin.isEnabled = true
                     loginBinding.btnLogin.text = getString(R.string.login)
                     loginBinding.pbLogin.visibility = View.GONE
@@ -119,10 +129,65 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun loginRedirect(){
+    private fun loginRedirect() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         this.overridePendingTransition(0, 0)
         finish()
+    }
+
+    fun toForgotPassword(view: View) {
+        forgotPasswordBinding = ActivityForgotPasswordBinding.inflate(layoutInflater)
+        setContentView(forgotPasswordBinding.root)
+    }
+
+    fun toLogin(view: View) {
+        forgotPasswordBinding.etEmail.text = null
+        forgotPasswordBinding.tilEmailContainer.error = null
+        setContentView(loginBinding.root)
+    }
+
+    fun sendResetMail(view: View) {
+        val email = forgotPasswordBinding.etEmail.text.toString()
+        val validEmail = validEmail(email)
+        forgotPasswordBinding.tilEmailContainer.error = null
+        Log.d("TAG", "sendResetMail: $validEmail")
+        if (validEmail == null) {
+            forgotPasswordBinding.btnSend.isEnabled = false
+            forgotPasswordBinding.btnSend.text = ""
+            forgotPasswordBinding.pbSend.visibility = View.VISIBLE
+            val retrofitData = retrofitBuilder.sendPasswordResetMail(mapOf("email" to email))
+            retrofitData.enqueue(object : Callback<Default> {
+                override fun onResponse(call: Call<Default>, response: Response<Default>) {
+                    if (response.isSuccessful) {
+                        Log.d("TAG", "onResponse: ${response.body()}")
+                        forgotPasswordBinding.btnSend.visibility = View.GONE
+                        forgotPasswordBinding.pbSend.visibility = View.GONE
+                        forgotPasswordBinding.llEmailContainer.visibility = View.GONE
+                        forgotPasswordBinding.llSuccessContainer.visibility = View.VISIBLE
+                    } else {
+                        Log.d("TAG", "onResponse:${response.errorBody().toString()}")
+                        forgotPasswordBinding.tilEmailContainer.error = "Invalid email"
+                        forgotPasswordBinding.btnSend.isEnabled = true
+                        forgotPasswordBinding.btnSend.text = "Send Reset Mail"
+                        forgotPasswordBinding.pbSend.visibility = View.GONE
+                    }
+                }
+
+                override fun onFailure(call: Call<Default>, t: Throwable) {
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "No connection to server",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    forgotPasswordBinding.btnSend.isEnabled = true
+                    forgotPasswordBinding.btnSend.text = "Send Reset Mail"
+                    forgotPasswordBinding.pbSend.visibility = View.GONE
+                    Log.d("TAG", t.message.toString())
+                }
+            })
+        } else {
+            forgotPasswordBinding.tilEmailContainer.error = validEmail
+        }
     }
 }

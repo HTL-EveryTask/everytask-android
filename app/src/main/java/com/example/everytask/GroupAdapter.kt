@@ -5,12 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.everytask.databinding.FragmentGroupsBinding
 import com.example.everytask.databinding.RowGroupsBinding
-import com.example.everytask.databinding.RowTasksBinding
 import com.example.everytask.fragments.GroupsFragment
-import com.example.everytask.fragments.HomeFragment
-import com.example.everytask.models.Task
 import com.example.everytask.models.response.groups.Group
 
 class GroupAdapter(val groupList: List<Group>, val groupsFragment: GroupsFragment): RecyclerView.Adapter<GroupAdapter.GroupViewHolder>() {

@@ -11,7 +11,8 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
 import com.example.everytask.databinding.ActivityTaskAddBinding
-import com.example.everytask.models.Task
+import com.example.everytask.models.call.TaskInfo
+import com.example.everytask.models.response.tasks.Task
 import com.example.everytask.models.response.Default
 import retrofit2.Call
 import retrofit2.Callback
@@ -117,8 +118,8 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
             binding.editTask.etDescription.error = "Description cannot be longer than 300 characters"
             return
         }
-        val call = retrofitBuilder.addTask(TOKEN, Task(title, description, dueDate))
-        Log.d("TAG", "addTask: ${Task(title, description, dueDate)}")
+        val call = retrofitBuilder.addTask(TOKEN, TaskInfo(title, description, dueDate))
+        Log.d("TAG", "addTask: ${TaskInfo(title, description, dueDate)}")
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
                 if (response.isSuccessful) {

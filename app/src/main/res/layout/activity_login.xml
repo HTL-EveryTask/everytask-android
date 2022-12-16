@@ -96,6 +96,16 @@
                     android:text="@string/passwordMock"/>
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:id="@+id/tv_toForgotPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10sp"
+                android:onClick="toForgotPassword"
+                android:text="Forgot Password?"
+                android:textColor="@color/raisin"
+                tools:ignore="UsingOnClickInXml"
+                android:layout_gravity="end"/>
         </LinearLayout>
 
         <FrameLayout

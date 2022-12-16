@@ -1,6 +1,6 @@
 package com.example.everytask.models.response
 
-import com.example.everytask.models.Task
+import com.example.everytask.models.response.tasks.Task
 import com.example.everytask.models.response.groups.Group
 
 data class Default(

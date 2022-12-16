@@ -1,9 +1,8 @@
 package com.example.everytask
 
-import com.example.everytask.models.Task
+import com.example.everytask.models.response.tasks.Task
 import com.example.everytask.models.call.*
 import com.example.everytask.models.response.Default
-import com.example.everytask.models.response.groups.Group
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -42,6 +41,23 @@ interface ApiInterface {
         @Body body: Map<String,String>
     ): Call<Default>
 
+    @HTTP(method = "DELETE", path = "user", hasBody = true)
+    fun deleteAccount(
+        @Header("Authorization") token: String,
+        @Body body: Map<String,String>
+    ): Call<Default>
+
+    @PATCH("password")
+    fun changePassword(
+        @Header("Authorization") token: String,
+        @Body passwordInfo: PasswordInfo
+    ): Call<Default>
+
+    @POST("password")
+    fun sendPasswordResetMail(
+        @Body body: Map<String,String>
+    ): Call<Default>
+
     // TASKS --------------------------------------------------------------------------------------------
 
     @GET("tasks")
@@ -58,7 +74,7 @@ interface ApiInterface {
     @PUT("task")
     fun addTask(
         @Header("Authorization") token: String,
-        @Body task: Task
+        @Body taskInfo: TaskInfo
     ): Call<Default>
 
     @HTTP(method = "DELETE", path = "task/{id}", hasBody = true)
@@ -78,7 +94,7 @@ interface ApiInterface {
     fun updateTask(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
-        @Body task: Task
+        @Body taskInfo: TaskInfo
     ): Call<Default>
 
     // GROUPS --------------------------------------------------------------------------------------------
@@ -110,6 +126,13 @@ interface ApiInterface {
     fun leaveGroup(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
+    ): Call<Default>
+
+    @PATCH("group/{id}")
+    fun updateGroup(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body body: GroupInfo
     ): Call<Default>
 
     // CONNECTIONS --------------------------------------------------------------------------------------------

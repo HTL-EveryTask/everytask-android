@@ -12,7 +12,7 @@ import android.widget.Toast
 import com.example.everytask.*
 import com.example.everytask.databinding.FragmentHomeBinding
 import com.example.everytask.models.response.Default
-import com.example.everytask.models.Task
+import com.example.everytask.models.response.tasks.Task
 import com.example.everytask.sharedPreferences
 import retrofit2.Call
 import retrofit2.Callback

@@ -11,7 +11,8 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
 import com.example.everytask.databinding.ActivityTaskEditBinding
-import com.example.everytask.models.Task
+import com.example.everytask.models.call.TaskInfo
+import com.example.everytask.models.response.tasks.Task
 import com.example.everytask.models.response.Default
 import retrofit2.Call
 import retrofit2.Callback
@@ -55,10 +56,16 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         pickDate()
 
         //set all the values
-        task = getSerializable(this, "TASK",Task::class.java)
+        task = getSerializable(this, "TASK", Task::class.java)
         binding.editTask.etTitle.setText(task.title)
         binding.editTask.etDescription.setText(task.description)
         binding.editTask.etDueDate.setText(task.due_time)
+        //set saved values
+        savedDay = task.due_time.split("-")[2].split(" ")[0].toInt()
+        savedMonth = task.due_time.split("-")[1].toInt()
+        savedYear = task.due_time.split("-")[0].toInt()
+        savedHour = task.due_time.split(" ")[1].split(":")[0].toInt()
+        savedMinute = task.due_time.split(":")[1].toInt()
     }
 
     private fun getDateTimeCalendar() {
@@ -118,8 +125,9 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             return
         }
         val call = retrofitBuilder.updateTask(TOKEN,
-            task.id!!,Task(title, description, dueDate, task.id))
-        Log.d("TAG", "editTask: ${Task(title, description, dueDate)}")
+            task.id, TaskInfo(title, description, dueDate)
+        )
+        Log.d("TAG", "editTask: ${TaskInfo(title, description, dueDate)}")
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
                 if (response.isSuccessful) {

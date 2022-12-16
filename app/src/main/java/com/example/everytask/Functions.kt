@@ -14,7 +14,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.Serializable
 
-internal var BASE_URL = "http://10.21.17.146:8000/api/"
+internal var BASE_URL = "http://192.168.0.69:8000/api/"
 
 internal var retrofitBuilder = Retrofit.Builder()
     .baseUrl(BASE_URL)

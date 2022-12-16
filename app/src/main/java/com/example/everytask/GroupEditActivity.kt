@@ -9,17 +9,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
-import com.example.everytask.databinding.ActivityGroupAddBinding
 import com.example.everytask.databinding.ActivityGroupEditBinding
-import com.example.everytask.models.Task
 import com.example.everytask.models.call.GroupInfo
 import com.example.everytask.models.response.Default
 import com.example.everytask.models.response.groups.Group
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
 
 class GroupEditActivity : AppCompatActivity() {
 
@@ -27,6 +23,7 @@ class GroupEditActivity : AppCompatActivity() {
     private lateinit var TOKEN: String
 
     private lateinit var group: Group
+    private lateinit var userId: String
 
     private lateinit var binding: ActivityGroupEditBinding
 
@@ -35,6 +32,7 @@ class GroupEditActivity : AppCompatActivity() {
         binding = ActivityGroupEditBinding.inflate(layoutInflater)
 
         TOKEN = sharedPreferences.getString("TOKEN", null)!!
+        userId = sharedPreferences.getString("USER_ID", null)!!
 
         setContentView(binding.root)
 
@@ -47,7 +45,8 @@ class GroupEditActivity : AppCompatActivity() {
         //set all the values
         binding.editGroup.etName.setText(group.name)
         binding.editGroup.etDescription.setText(group.description)
-        val adapter = MemberAdapter(group.users, this)
+        val sorted = group.users.sortedWith(compareBy({ it.id != userId.toInt() }, { !it.is_admin }, { it.username }))
+        val adapter = MemberAdapter(sorted, this)
         binding.rvMembers.adapter = adapter
         binding.etInviteLink.inputType = 0
     }
@@ -59,7 +58,39 @@ class GroupEditActivity : AppCompatActivity() {
     }
 
     fun updateGroup(view: View) {
-        //TODO implement update group
+        val name = binding.editGroup.etName.text.toString()
+        val description = binding.editGroup.etDescription.text.toString()
+
+        if (name.isEmpty()) {
+            binding.editGroup.etName.error = "Name is required"
+            return
+        }
+        if (name.length > 32) {
+            binding.editGroup.etName.error = "Name is too long"
+            return
+        }
+        if (description.length > 300) {
+            binding.editGroup.etDescription.error = "Description is too long"
+            return
+        }
+
+        val groupInfo = GroupInfo(name, description)
+        val call = retrofitBuilder.updateGroup(TOKEN, group.id, groupInfo)
+        call.enqueue(object : Callback<Default> {
+            override fun onResponse(call: Call<Default>, response: Response<Default>) {
+                if (response.isSuccessful) {
+                    Log.d("TAG", "onResponse: ${response.body()}")
+                    finish()
+                } else {
+                    Log.d("TAG", "onResponse: ${response.errorBody()}")
+                    Toast.makeText(this@GroupEditActivity, "You are not Admin of this Group", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Default>, t: Throwable) {
+                Toast.makeText(this@GroupEditActivity, "Something went wrong", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     fun showLeaveAlert(view: View) {

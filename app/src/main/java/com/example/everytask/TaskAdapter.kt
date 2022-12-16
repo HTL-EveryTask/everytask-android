@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.everytask.databinding.RowTasksBinding
 import com.example.everytask.fragments.HomeFragment
-import com.example.everytask.models.Task
+import com.example.everytask.models.response.tasks.Task
 
 class TaskAdapter(val taskList: List<Task>, val homeFragment: HomeFragment): RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
