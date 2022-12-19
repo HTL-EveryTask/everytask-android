@@ -99,7 +99,25 @@
                 tools:ignore="RtlSymmetry" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingVertical="5sp">
 
+            <!-- text view to show the selected item-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_assignee"
+                android:hint="Select assigned"
+                android:padding="12dp"
+                android:gravity="center_vertical"
+                android:drawableEnd="@drawable/ic_baseline_keyboard_arrow_down_24"
+                android:background="@android:drawable/editbox_background"
+                />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
