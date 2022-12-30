@@ -97,41 +97,8 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             dialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.show()
 
-            val adapter = AssigneeAdapter(this, filteredList, dialogBinding.flAssigneeContainer)
+            val adapter = AssigneeAdapter(this, assignees, filteredList, dialogBinding.etAssigneeSearch, dialogBinding.flAssigneeContainer)
             dialogBinding.rvAssignees.adapter = adapter
-
-            dialogBinding.etAssigneeSearch.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
-
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    filteredList = assignees.filter {
-                        it.lowercase(Locale.getDefault()).contains(
-                            s.toString().lowercase(Locale.getDefault())
-                        )
-                    }.toMutableList()
-                    var chips = dialogBinding.flAssigneeContainer.children
-                    chips = chips.filter { chip ->
-                        chip is Chip
-                    }
-                    chips.forEach { chip ->
-                        if (filteredList.contains((chip as Chip).text)) {
-                            filteredList.remove(chip.text)
-                        }
-                    }
-                    Log.d("TAG", "assignees: $assignees")
-                    Log.d("TAG", "filteredList: $filteredList")
-                    Log.d("TAG", "chips: $chips")
-                    adapter.setList(filteredList)
-                }
-
-                override fun afterTextChanged(s: Editable) {}
-            })
         })
     }
 
