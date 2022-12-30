@@ -1,11 +1,17 @@
 package com.example.everytask
 
 import android.app.Activity
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import android.util.Patterns
+import android.view.View
+import androidx.core.content.ContextCompat
+import com.example.everytask.adapters.AssigneeAdapter
 import com.example.everytask.models.response.Default
+import com.google.android.flexbox.FlexboxLayout
+import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
@@ -28,7 +34,11 @@ val type = object : TypeToken<Default>() {}.type
 internal lateinit var sharedPreferences: SharedPreferences
 internal lateinit var editor: SharedPreferences.Editor
 
-internal fun confirmPasswordFocusListener(tilConfirmPasswordContainer: TextInputLayout, etConfirmPassword: TextInputEditText, etPassword: TextInputEditText) {
+internal fun confirmPasswordFocusListener(
+    tilConfirmPasswordContainer: TextInputLayout,
+    etConfirmPassword: TextInputEditText,
+    etPassword: TextInputEditText
+) {
     etConfirmPassword.setOnFocusChangeListener { _, focused ->
         if (!focused) {
             if (etPassword.text.toString() != etConfirmPassword.text.toString()) {
@@ -71,7 +81,10 @@ internal fun passwordFocusListener(
     }
 }
 
-internal fun usernameFocusListener(etUsername: TextInputEditText, tilUsernameContainer: TextInputLayout) {
+internal fun usernameFocusListener(
+    etUsername: TextInputEditText,
+    tilUsernameContainer: TextInputLayout
+) {
     etUsername.setOnFocusChangeListener { _, focused ->
         if (!focused) {
             tilUsernameContainer.helperText = validUsername(etUsername.text.toString())
@@ -106,11 +119,24 @@ internal fun validEmail(email: String): String? {
     }
 }
 
+internal fun createChip(context: Context, person: String, chipGroup: FlexboxLayout, adapter: AssigneeAdapter) {
+    val chip = Chip(context)
+    chip.text = person
+    chip.chipIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_person_outline_24)
+    chip.isCloseIconEnabled = true
+    chip.isClickable = true
+    chip.isCheckable = false
+    chipGroup.addView(chip as View, chipGroup.childCount - 1)
+    chip.setOnCloseIconClickListener {
+        chipGroup.removeView(chip as View)
+        adapter.addAssignee(person)
+    }
+}
+
 internal fun Int.toBoolean() = this == 1
 
-fun <T : Serializable?> getSerializable(activity: Activity, name: String, clazz: Class<T>): T
-{
-    return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+fun <T : Serializable?> getSerializable(activity: Activity, name: String, clazz: Class<T>): T {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
         activity.intent.getSerializableExtra(name, clazz)!!
     else
         activity.intent.getSerializableExtra(name) as T

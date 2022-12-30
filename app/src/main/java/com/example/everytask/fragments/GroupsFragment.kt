@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.example.everytask.*
+import com.example.everytask.adapters.GroupAdapter
 import com.example.everytask.databinding.FragmentGroupsBinding
 import com.example.everytask.models.response.Default
 import com.example.everytask.retrofitBuilder

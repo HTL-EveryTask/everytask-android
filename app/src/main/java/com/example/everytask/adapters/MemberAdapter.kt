@@ -1,9 +1,10 @@
-package com.example.everytask
+package com.example.everytask.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.everytask.GroupEditActivity
 import com.example.everytask.databinding.RowMembersBinding
 import com.example.everytask.models.response.groups.GroupUser
 
@@ -15,7 +16,6 @@ class MemberAdapter(val userList: List<GroupUser>, val groupEditActivity: GroupE
     ): RecyclerView.ViewHolder(rowMembersBinding.root){
         fun bind(user: GroupUser){
             rowMembersBinding.tvUsername.text = user.username
-            // TODO if user is admin, show admin icon
             if(user.is_admin){
                 rowMembersBinding.ivAdmin.visibility = View.VISIBLE
             }

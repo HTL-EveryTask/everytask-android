@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="16dp"
     android:background="@android:color/white">
@@ -15,28 +16,38 @@
         android:textStyle="bold"
         />
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/cg_chips"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:multiLine="true"
-        />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/et_assignee"
-        android:hint="Search..."
-        android:padding="12dp"
-        android:singleLine="true"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        />
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/fl_assigneeContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_gravity="center_vertical"
+                app:flexWrap="wrap"
+                app:alignItems="stretch"
+                app:alignContent="space_around"
+                app:showDivider="beginning|middle|end"
+                app:dividerDrawable="@drawable/ic_divider">
 
-    <ListView
+                <EditText
+                    android:id="@+id/et_assignee_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_flexGrow="1"
+                    android:inputType="text"/>
+
+            </com.google.android.flexbox.FlexboxLayout>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_assignees"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/lv_assignee"
-        />
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/row_assignee"/>
 
 </LinearLayout>

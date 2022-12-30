@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.example.everytask.adapters.MemberAdapter
 import com.example.everytask.databinding.ActivityGroupEditBinding
 import com.example.everytask.models.call.GroupInfo
 import com.example.everytask.models.response.Default

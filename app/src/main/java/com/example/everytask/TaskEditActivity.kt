@@ -1,6 +1,5 @@
 package com.example.everytask
 
-import android.R
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.Dialog
@@ -15,12 +14,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.children
+import com.example.everytask.adapters.AssigneeAdapter
 import com.example.everytask.databinding.ActivityTaskEditBinding
 import com.example.everytask.databinding.DialogSearchableSpinnerBinding
 import com.example.everytask.models.call.TaskInfo
 import com.example.everytask.models.response.Default
 import com.example.everytask.models.response.tasks.Task
 import com.google.android.material.chip.Chip
+import kotlinx.android.synthetic.main.dialog_searchable_spinner.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -77,22 +79,28 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         savedHour = task.due_time.split(" ")[1].split(":")[0].toInt()
         savedMinute = task.due_time.split(":")[1].toInt()
 
-        //make an array of the users
-        val users = arrayOf("User 1", "User 2", "User 3", "User 4", "User 5", "User 6", "User 7", "User 8", "User 9", "User 10")
+        //make a read-only list of assignees with hardcoded values
+        val assignees = List(100) { "Assignee $it" }
+        var filteredList = assignees.sorted().toMutableList()
 
-        binding.editTask.tvAssignee.setOnClickListener(View.OnClickListener { val dialog = Dialog(this)
+        binding.editTask.tvAssignee.setOnClickListener(View.OnClickListener {
+            val dialog = Dialog(this)
             //call removeView to remove the view from the parent
             (dialogBinding.root.parent as ViewGroup?)?.removeView(dialogBinding.root)
 
+
             dialog.setContentView(dialogBinding.root)
-            dialog.getWindow()?.setLayout(LinearLayout.LayoutParams.MATCH_PARENT-1000, 800)
+            dialog.getWindow()?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             dialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.show()
-            val adapter: ListAdapter = ArrayAdapter(this, R.layout.simple_list_item_1, users)
 
-            // set adapter
-            dialogBinding.lvAssignee.adapter = adapter
-            dialogBinding.etAssignee.addTextChangedListener(object : TextWatcher {
+            val adapter = AssigneeAdapter(this, filteredList, dialogBinding.flAssigneeContainer)
+            dialogBinding.rvAssignees.adapter = adapter
+
+            dialogBinding.etAssigneeSearch.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
                     s: CharSequence,
                     start: Int,
@@ -100,14 +108,29 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                     after: Int
                 ) {
                 }
+
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    (adapter as ArrayAdapter<*>).filter.filter(s)
+                    filteredList = assignees.filter {
+                        it.lowercase(Locale.getDefault()).contains(
+                            s.toString().lowercase(Locale.getDefault())
+                        )
+                    }.toMutableList()
+                    var chips = dialogBinding.flAssigneeContainer.children
+                    chips = chips.filter { chip ->
+                        chip is Chip
+                    }
+                    chips.forEach { chip ->
+                        if (filteredList.contains((chip as Chip).text)) {
+                            filteredList.remove(chip.text)
+                        }
+                    }
+                    Log.d("TAG", "assignees: $assignees")
+                    Log.d("TAG", "filteredList: $filteredList")
+                    Log.d("TAG", "chips: $chips")
+                    adapter.setList(filteredList)
                 }
 
                 override fun afterTextChanged(s: Editable) {}
-            })
-            dialogBinding.lvAssignee.setOnItemClickListener(AdapterView.OnItemClickListener { parent, view, position, id -> // when item selected from list
-                createChip(users[position])
             })
         })
     }
@@ -165,10 +188,12 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             return
         }
         if (description.length > 300) {
-            binding.editTask.etDescription.error = "Description cannot be longer than 300 characters"
+            binding.editTask.etDescription.error =
+                "Description cannot be longer than 300 characters"
             return
         }
-        val call = retrofitBuilder.updateTask(TOKEN,
+        val call = retrofitBuilder.updateTask(
+            TOKEN,
             task.id, TaskInfo(title, description, dueDate)
         )
         Log.d("TAG", "editTask: ${TaskInfo(title, description, dueDate)}")
@@ -179,7 +204,11 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                     finish()
                 } else {
                     Log.d("TAG", "onResponse: ${response.errorBody()}")
-                    Toast.makeText(this@TaskEditActivity, "You are not the creator of this Task", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@TaskEditActivity,
+                        "You are not the creator of this Task",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -193,17 +222,5 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
     fun cancelTask(view: View) {
         finish()
-    }
-
-    fun createChip(text: String) {
-        val chip = Chip(this)
-        chip.text = text
-        chip.isCloseIconVisible = true
-        chip.isClickable = true
-        chip.isCheckable = false
-        dialogBinding.cgChips.addView(chip)
-        chip.setOnCloseIconClickListener {
-            dialogBinding.cgChips.removeView(chip)
-        }
     }
 }

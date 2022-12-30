@@ -1,10 +1,11 @@
-package com.example.everytask
+package com.example.everytask.adapters
 
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.everytask.GroupEditActivity
 import com.example.everytask.databinding.RowGroupsBinding
 import com.example.everytask.fragments.GroupsFragment
 import com.example.everytask.models.response.groups.Group

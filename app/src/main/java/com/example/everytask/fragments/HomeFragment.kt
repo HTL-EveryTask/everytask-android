@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.example.everytask.*
+import com.example.everytask.adapters.TaskAdapter
 import com.example.everytask.databinding.FragmentHomeBinding
 import com.example.everytask.models.response.Default
 import com.example.everytask.models.response.tasks.Task

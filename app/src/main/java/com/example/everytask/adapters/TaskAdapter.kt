@@ -1,10 +1,11 @@
-package com.example.everytask
+package com.example.everytask.adapters
 
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.everytask.TaskEditActivity
 import com.example.everytask.databinding.RowTasksBinding
 import com.example.everytask.fragments.HomeFragment
 import com.example.everytask.models.response.tasks.Task
