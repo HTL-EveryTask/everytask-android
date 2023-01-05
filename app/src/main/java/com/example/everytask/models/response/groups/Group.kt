@@ -5,5 +5,6 @@ data class Group(
     val id: Int,
     val name: String,
     val stats: Stats,
-    val users: List<GroupUser>
+    val users: List<GroupUser>,
+    val picture: String?
 ): java.io.Serializable

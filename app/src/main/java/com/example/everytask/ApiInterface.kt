@@ -135,6 +135,12 @@ interface ApiInterface {
         @Body body: GroupInfo
     ): Call<Default>
 
+    @HTTP(method = "DELETE", path = "group/{id}/key")
+    fun lockGroup(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+    ): Call<Default>
+
     // CONNECTIONS --------------------------------------------------------------------------------------------
 
     @POST("untis")

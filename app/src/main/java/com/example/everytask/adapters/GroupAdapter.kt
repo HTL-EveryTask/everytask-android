@@ -1,6 +1,8 @@
 package com.example.everytask.adapters
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.startActivity
@@ -17,6 +19,11 @@ class GroupAdapter(val groupList: List<Group>, val groupsFragment: GroupsFragmen
         val groupsFragment: GroupsFragment,
     ): RecyclerView.ViewHolder(groupsBinding.root){
         fun bind(group: Group){
+            if(group.picture != ""){
+                val imageBytes = android.util.Base64.decode(group.picture, android.util.Base64.DEFAULT)
+                val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                groupsBinding.ivGroupIcon.setImageBitmap(decodedImage)
+            }
             groupsBinding.tvGroupName.text = group.name
             groupsBinding.tvGroupDescription.text = group.description
             groupsBinding.tvMemberCount.text = group.stats.total_users.toString()

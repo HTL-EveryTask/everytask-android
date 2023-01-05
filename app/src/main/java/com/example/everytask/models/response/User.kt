@@ -6,5 +6,6 @@ data class User(
     val is_active: Boolean,
     val is_teacher: Boolean,
     val token: String,
-    val username: String
+    val username: String,
+    val profile_picture: String,
 ) : java.io.Serializable

@@ -2,6 +2,7 @@ package com.example.everytask.fragments
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -17,15 +18,19 @@ import com.example.everytask.models.call.PasswordInfo
 import com.example.everytask.retrofitBuilder
 import com.example.everytask.sharedPreferences
 import com.example.everytask.models.response.Default
+import com.example.everytask.models.response.User
 import com.example.everytask.validPassword
 import com.google.android.material.textfield.TextInputLayout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.util.Base64
 
 class SettingsFragment : Fragment() {
 
     private lateinit var TOKEN: String
+
+    private lateinit var user: User
 
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
@@ -38,7 +43,7 @@ class SettingsFragment : Fragment() {
 
         TOKEN = sharedPreferences.getString("TOKEN", null)!!
 
-        getUsername()
+        getUser()
 
         binding.btnLogout.setOnClickListener {
             sharedPreferences.edit().remove("TOKEN").apply()
@@ -140,15 +145,21 @@ class SettingsFragment : Fragment() {
         builder.show()
     }
 
-    private fun getUsername() {
-        var call = retrofitBuilder.getUserData(TOKEN)
+    private fun getUser() {
+        val call = retrofitBuilder.getUserData(TOKEN)
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
                 if (response.isSuccessful) {
                     val body = response.body()
-                    val user = body?.user
-                    if (user != null) {
+                    if (body?.user != null) {
+                        user = body.user
+
                         binding.etUsername.setText(user.username)
+
+                        //set profile picture from user as base64
+                        val imageBytes = Base64.decode(user.profile_picture, Base64.DEFAULT)
+                        val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                        binding.ivProfilePic.setImageBitmap(decodedImage)
                     }
                 }
             }

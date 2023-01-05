@@ -4,9 +4,11 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
+import android.util.Base64
 import android.util.Log
 import android.util.Patterns
 import android.view.View
@@ -15,6 +17,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.example.everytask.adapters.AssigneeAdapter
 import com.example.everytask.models.response.Default
+import com.example.everytask.models.response.User
 import com.example.everytask.models.response.groups.Group
 import com.example.everytask.models.response.groups.GroupUser
 import com.example.everytask.models.response.tasks.AssignedGroup
@@ -146,11 +149,11 @@ internal fun createChip(context: Context, person: String, type: String, chipGrou
     }
 }
 
-internal fun Int.toBoolean() = this == 1
-
 fun <T : Serializable?> getSerializable(activity: Activity, name: String, clazz: Class<T>): T {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
         activity.intent.getSerializableExtra(name, clazz)!!
     else
         activity.intent.getSerializableExtra(name) as T
 }
+
+internal fun Int.toBoolean() = this == 1

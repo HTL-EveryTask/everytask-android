@@ -11,9 +11,12 @@ import android.view.View
 import android.widget.Toast
 import com.example.everytask.adapters.MemberAdapter
 import com.example.everytask.databinding.ActivityGroupEditBinding
+import com.example.everytask.databinding.DialogEditUserBinding
 import com.example.everytask.models.call.GroupInfo
 import com.example.everytask.models.response.Default
 import com.example.everytask.models.response.groups.Group
+import com.example.everytask.models.response.groups.GroupUser
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -41,13 +44,23 @@ class GroupEditActivity : AppCompatActivity() {
         actionbar.title = "Edit Group"
         actionbar.setDisplayHomeAsUpEnabled(true)
 
-
         group = getSerializable(this, "GROUP", Group::class.java)
+
+        //if the user is not an admin, disable all the fields
+        val user = group.users.find { it.id == userId.toInt() }
+        if (user!!.is_admin) {
+            binding.editGroup.etName.isEnabled = false
+            binding.editGroup.etDescription.isEnabled = false
+            binding.btnGenerate.isEnabled = false
+            binding.btnLock.visibility = View.GONE
+            binding.btnSave.visibility = View.GONE
+        }
+
         //set all the values
         binding.editGroup.etName.setText(group.name)
         binding.editGroup.etDescription.setText(group.description)
         val sorted = group.users.sortedWith(compareBy({ it.id != userId.toInt() }, { !it.is_admin }, { it.username }))
-        val adapter = MemberAdapter(sorted, this)
+        val adapter = MemberAdapter(sorted, user.is_admin, this)
         binding.rvMembers.adapter = adapter
         binding.etInviteLink.inputType = 0
     }
@@ -136,6 +149,30 @@ class GroupEditActivity : AppCompatActivity() {
         finish()
     }
 
+    fun lockGroup(view: View){
+        val call = retrofitBuilder.lockGroup(TOKEN, group.id)
+        call.enqueue(object : Callback<Default> {
+            override fun onResponse(
+                call: Call<Default>,
+                response: Response<Default>
+            ) {
+                if (response.isSuccessful) {
+                    Toast.makeText(this@GroupEditActivity, "Group Locked", Toast.LENGTH_SHORT).show() }
+            }
+
+            override fun onFailure(
+                call: Call<Default>,
+                t: Throwable
+            ) {
+                Toast.makeText(
+                    this@GroupEditActivity,
+                    "No connection to server",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+    }
+
     fun copyInviteLink(view: View) {
         val clipboard: ClipboardManager =
             getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -160,6 +197,21 @@ class GroupEditActivity : AppCompatActivity() {
                 Log.d("TAG", "onFailure: ${t.message}")
             }
         })
+    }
+
+    fun showEditUserDialog(user: GroupUser) {
+        val dialog = BottomSheetDialog(this)
+        val binding = DialogEditUserBinding.inflate(layoutInflater)
+        binding.tvKickMember.setOnClickListener {
+            //TODO kick member
+            dialog.dismiss()
+        }
+        binding.tvMakeAdmin.setOnClickListener {
+            //TODO make admin
+            dialog.dismiss()
+        }
+        dialog.setContentView(binding.root)
+        dialog.show()
     }
 
 }
