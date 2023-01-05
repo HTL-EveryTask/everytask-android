@@ -19,7 +19,9 @@ import com.example.everytask.databinding.DialogSearchableSpinnerBinding
 import com.example.everytask.fragments.GroupsFragment
 import com.example.everytask.models.call.TaskInfo
 import com.example.everytask.models.response.Default
+import com.example.everytask.models.response.User
 import com.example.everytask.models.response.groups.Group
+import com.example.everytask.models.response.groups.GroupUser
 import com.example.everytask.models.response.tasks.AssignedGroup
 import com.example.everytask.models.response.tasks.AssignedUser
 import com.example.everytask.models.response.tasks.Task
@@ -211,10 +213,11 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         finish()
     }
 
-    fun initializeAssignables(){
+    fun initializeAssignables() {
         val assignees = getAssignees(groups)
 
         val filteredList = assignees.sortedWith(compareBy { it !is AssignedGroup }).toMutableList()
+
         Log.d("TAG", filteredList.toString())
 
         binding.editTask.tvAssignee.setOnClickListener(View.OnClickListener {
@@ -240,11 +243,31 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             )
             dialogBinding.rvAssignees.adapter = adapter
 
-
-            //create chips for every currently assigned
-            for (i in task.assigned_groups.sortedBy { it.name } + task.assigned_users.sortedBy { it.username }) {
-                val assigneeName = if(i is AssignedUser) i.username else (i as AssignedGroup).name
-                createChip(this, assigneeName, dialogBinding.flAssigneeContainer, adapter)
+            //create chips for every currently assigned if flAssigneeContainer contains only one child
+            if(dialogBinding.flAssigneeContainer.childCount == 1) {
+                for (i in task.assigned_groups.sortedBy { it.name } + task.assigned_users.sortedBy { it.username }) {
+                    val assigneeName =
+                        if (i is AssignedUser) i.username else (i as AssignedGroup).name
+                    createChip(this, assigneeName, dialogBinding.flAssigneeContainer, adapter)
+                    Log.d("TAG", "assigned: $i")
+                    Log.d("TAG", "filtered: $filteredList")
+                    //when assigned is AssignedGroup, remove group and all users from filteredList
+                    if (i is AssignedGroup) {
+                        //get the group from filteredList
+                        val group = filteredList.find { it is Group && it.id == i.id }
+                        //remove group from filteredList
+                        filteredList.remove(group)
+                        //remove all users from filteredList
+                        for (user in (group as Group).users) {
+                            filteredList.remove(user)
+                        }
+                    } else if (i is AssignedUser) {
+                        val user = filteredList.find { it is GroupUser && it.id == i.id }
+                        Log.d("TAG", "user: $user")
+                        Log.d("TAG", "i: $i")
+                        filteredList.remove(user)
+                    }
+                }
             }
         })
     }

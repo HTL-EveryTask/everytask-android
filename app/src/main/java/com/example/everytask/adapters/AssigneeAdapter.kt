@@ -56,7 +56,7 @@ class AssigneeAdapter(
                 }
                 removeSelected()
 
-                //TODO sort
+                sort()
                 notifyDataSetChanged()
             }
 
@@ -71,6 +71,7 @@ class AssigneeAdapter(
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
+        search.text.clear()
         return AssigneeViewHolder(
             RowAssigneeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
@@ -83,11 +84,21 @@ class AssigneeAdapter(
         holder.assigneeBinding.clAsigneeContainer.setOnClickListener {
             val assigneeName =
                 if (assignee is GroupUser) assignee.username else (assignee as Group).name
+
+            //if assignee is group remove all chips of the users in the group
+            if (assignee is Group) {
+                assignee.users.forEach { user ->
+                    chips.forEach { chip ->
+                        if (chip is Chip && chip.text == user.username) {
+                            chipGroup.removeView(chip)
+                        }
+                    }
+                }
+            }
+
             createChip(activity, assigneeName, chipGroup, this)
             //remove assignee from list
-            filteredList.remove(assignee)
-            //notify adapter
-            notifyDataSetChanged()
+            removeSelected()
         }
     }
 
@@ -103,8 +114,19 @@ class AssigneeAdapter(
             val assigneeToAdd =
                 assigneeList.first { it is Group && it.name == assignee || it is GroupUser && it.username == assignee }
             //add assignee to filtered list
-            filteredList.add(assigneeToAdd)
-            //TODO sort
+            if(!filteredList.contains(assigneeToAdd)) {
+                filteredList.add(assigneeToAdd)
+            }
+            //if assignee is a group add all users to filtered list
+            if (assigneeToAdd is Group) {
+                assigneeToAdd.users.forEach {
+                    //if user is not already in filtered list add it
+                    if (!filteredList.contains(it)) {
+                        filteredList.add(it)
+                    }
+                }
+            }
+            sort()
             notifyDataSetChanged()
         }
     }
@@ -119,9 +141,19 @@ class AssigneeAdapter(
                     filteredList.first { it is Group && it.name == chip.text || it is GroupUser && it.username == chip.text }
                 //remove assignee from filtered list
                 filteredList.remove(assigneeToRemove)
+                if (assigneeToRemove is Group) {
+                    assigneeToRemove.users.forEach { user ->
+                        filteredList.remove(user)
+                    }
+                }
             }
         }
         Log.d("AssigneeAdapter", "removeSelected: $filteredList")
         notifyDataSetChanged()
+    }
+
+    fun sort() {
+        //sort the filtered list first by type (group or user) and then alphabetically
+        filteredList.sortWith(compareBy({ it !is Group }, { if (it is Group) it.name else (it as GroupUser).username }))
     }
 }
