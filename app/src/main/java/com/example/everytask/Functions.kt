@@ -1,21 +1,33 @@
 package com.example.everytask
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.util.Log
 import android.util.Patterns
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.example.everytask.adapters.AssigneeAdapter
 import com.example.everytask.models.response.Default
+import com.example.everytask.models.response.groups.Group
+import com.example.everytask.models.response.groups.GroupUser
+import com.example.everytask.models.response.tasks.AssignedGroup
+import com.example.everytask.models.response.tasks.AssignedUser
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.Serializable
@@ -119,9 +131,10 @@ internal fun validEmail(email: String): String? {
     }
 }
 
-internal fun createChip(context: Context, person: String, chipGroup: FlexboxLayout, adapter: AssigneeAdapter) {
+internal fun createChip(context: Context, person: String, type: String, chipGroup: FlexboxLayout, adapter: AssigneeAdapter) {
     val chip = Chip(context)
     chip.text = person
+    chip.tag = type
     chip.chipIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_person_outline_24)
     chip.isCloseIconEnabled = true
     chip.isClickable = true
@@ -129,7 +142,7 @@ internal fun createChip(context: Context, person: String, chipGroup: FlexboxLayo
     chipGroup.addView(chip as View, chipGroup.childCount - 1)
     chip.setOnCloseIconClickListener {
         chipGroup.removeView(chip as View)
-        adapter.addAssignee(person)
+        adapter.addAssignee(person, type)
     }
 }
 

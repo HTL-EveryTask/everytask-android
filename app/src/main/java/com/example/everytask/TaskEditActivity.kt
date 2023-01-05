@@ -25,6 +25,7 @@ import com.example.everytask.models.response.groups.GroupUser
 import com.example.everytask.models.response.tasks.AssignedGroup
 import com.example.everytask.models.response.tasks.AssignedUser
 import com.example.everytask.models.response.tasks.Task
+import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.dialog_searchable_spinner.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -41,6 +42,8 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     private lateinit var task: Task
 
     private lateinit var groups: List<Group>
+
+    private lateinit var assignees: List<java.io.Serializable>
 
     var day = 0
     var month = 0
@@ -145,11 +148,56 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                 "Description cannot be longer than 300 characters"
             return
         }
+        //get assignedUsers and assignedGroups from dialogBinding.flAssigneeContainer
+        val assignedUsers = mutableListOf<Int>()
+        val assignedGroups = mutableListOf<Int>()
+        Log.d("TAG", "assignees: $assignees")
+        if (dialogBinding.flAssigneeContainer.childCount > 1) {
+            for (i in 0 until dialogBinding.flAssigneeContainer.childCount) {
+                val assignee = dialogBinding.flAssigneeContainer.getChildAt(i)
+                if (assignee is Chip) {
+                    if (assignee.tag == GroupUser::class.java.name) {
+                        //if assignee is already in assignees from task
+                        if(task.assigned_users.any { it.username == assignee.text }) {
+                            assignedUsers.add(task.assigned_users.find { it.username == assignee.text }!!.id)
+                        } else {
+                            assignees.first { it is GroupUser && it.username == assignee.text }.let {
+                                assignedUsers.add((it as GroupUser).id)
+                            }
+                        }
+                    } else if(assignee.tag == Group::class.java.name) {
+                        //if assignee is already in assignees from task
+                        if(task.assigned_groups.any { it.name == assignee.text }) {
+                            assignedGroups.add(task.assigned_groups.find { it.name == assignee.text }!!.id)
+                        } else {
+                            assignees.first { it is Group && it.name == assignee.text }.let {
+                                assignedGroups.add((it as Group).id)
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            //add all already assigned users
+            task.assigned_users.forEach {
+                assignedUsers.add(it.id)
+            }
+            //add all already assigned groups
+            task.assigned_groups.forEach {
+                assignedGroups.add(it.id)
+            }
+        }
+        Log.d("TAG", "updateTask Users: $assignedUsers")
+        Log.d("TAG", "updateTask Groups: $assignedGroups")
+
+        Log.d(
+            "TAG",
+            "editTask: ${TaskInfo(title, description, dueDate, assignedUsers, assignedGroups)}"
+        )
         val call = retrofitBuilder.updateTask(
             TOKEN,
-            task.id, TaskInfo(title, description, dueDate)
+            task.id, TaskInfo(title, description, dueDate, assignedUsers, assignedGroups)
         )
-        Log.d("TAG", "editTask: ${TaskInfo(title, description, dueDate)}")
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
                 if (response.isSuccessful) {
@@ -195,18 +243,18 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         })
     }
 
-    fun getAssignees(groups: List<Group>): List<java.io.Serializable> {
+    fun getAssignees(groups: List<Group>) {
         //create a list of all users in the groups
-        val assignees = mutableListOf<java.io.Serializable>()
+        val assigneeList = mutableListOf<java.io.Serializable>()
         for (group in groups) {
-            assignees.add(group)
+            assigneeList.add(group)
             for (user in group.users) {
-                if (!assignees.contains(user)) {
-                    assignees.add(user)
+                if (!assigneeList.contains(user)) {
+                    assigneeList.add(user)
                 }
             }
         }
-        return assignees
+        assignees = assigneeList
     }
 
     fun cancelTask(view: View) {
@@ -214,7 +262,7 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     }
 
     fun initializeAssignables() {
-        val assignees = getAssignees(groups)
+        getAssignees(groups)
 
         val filteredList = assignees.sortedWith(compareBy { it !is AssignedGroup }).toMutableList()
 
@@ -234,6 +282,8 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             dialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.show()
 
+            filteredList.sortWith(compareBy({ it !is Group }, { if (it is Group) it.name else (it as GroupUser).username }))
+
             val adapter = AssigneeAdapter(
                 this,
                 assignees,
@@ -244,11 +294,21 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             dialogBinding.rvAssignees.adapter = adapter
 
             //create chips for every currently assigned if flAssigneeContainer contains only one child
-            if(dialogBinding.flAssigneeContainer.childCount == 1) {
+            if (dialogBinding.flAssigneeContainer.childCount == 1) {
                 for (i in task.assigned_groups.sortedBy { it.name } + task.assigned_users.sortedBy { it.username }) {
                     val assigneeName =
                         if (i is AssignedUser) i.username else (i as AssignedGroup).name
-                    createChip(this, assigneeName, dialogBinding.flAssigneeContainer, adapter)
+                    //Map classname if assignee is AssignedUser or AssignedGroup to full classname
+                    val assigneeClass =
+                        if (i is AssignedUser) GroupUser::class.java.name else Group::class.java.name
+                    Log.d("TAG", "initializeAssignables: $assigneeClass")
+                    createChip(
+                        this,
+                        assigneeName,
+                        assigneeClass,
+                        dialogBinding.flAssigneeContainer,
+                        adapter
+                    )
                     Log.d("TAG", "assigned: $i")
                     Log.d("TAG", "filtered: $filteredList")
                     //when assigned is AssignedGroup, remove group and all users from filteredList
@@ -258,8 +318,10 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                         //remove group from filteredList
                         filteredList.remove(group)
                         //remove all users from filteredList
-                        for (user in (group as Group).users) {
-                            filteredList.remove(user)
+                        if(group != null) {
+                            for (user in (group as Group).users) {
+                                filteredList.remove(user)
+                            }
                         }
                     } else if (i is AssignedUser) {
                         val user = filteredList.find { it is GroupUser && it.id == i.id }

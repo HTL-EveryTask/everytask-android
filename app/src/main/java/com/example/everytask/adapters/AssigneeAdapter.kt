@@ -71,7 +71,6 @@ class AssigneeAdapter(
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
-        search.text.clear()
         return AssigneeViewHolder(
             RowAssigneeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
@@ -95,8 +94,8 @@ class AssigneeAdapter(
                     }
                 }
             }
-
-            createChip(activity, assigneeName, chipGroup, this)
+            Log.d("TAG", "Class: ${assignee.javaClass.name}")
+            createChip(activity, assigneeName,assignee.javaClass.name, chipGroup, this)
             //remove assignee from list
             removeSelected()
         }
@@ -107,25 +106,29 @@ class AssigneeAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun addAssignee(assignee: String) {
+    fun addAssignee(assignee: String, type: String) {
         //if assignee contains search
         if (assignee.contains(search.text.toString(), true)) {
-            //get the assignee from the list
-            val assigneeToAdd =
-                assigneeList.first { it is Group && it.name == assignee || it is GroupUser && it.username == assignee }
-            //add assignee to filtered list
-            if(!filteredList.contains(assigneeToAdd)) {
-                filteredList.add(assigneeToAdd)
-            }
-            //if assignee is a group add all users to filtered list
-            if (assigneeToAdd is Group) {
-                assigneeToAdd.users.forEach {
-                    //if user is not already in filtered list add it
-                    if (!filteredList.contains(it)) {
+
+            if(type == "com.example.everytask.models.response.groups.GroupUser"){
+                assigneeList.forEach {
+                    if (it is GroupUser && it.username == assignee && !filteredList.contains(it)) {
                         filteredList.add(it)
                     }
                 }
+            }else if(type == "com.example.everytask.models.response.groups.Group"){
+                assigneeList.forEach {
+                    if (it is Group && it.name == assignee && !filteredList.contains(it)) {
+                        filteredList.add(it)
+                        it.users.forEach { user ->
+                            if (!filteredList.contains(user)) {
+                                filteredList.add(user)
+                            }
+                        }
+                    }
+                }
             }
+            removeSelected()
             sort()
             notifyDataSetChanged()
         }
@@ -135,15 +138,21 @@ class AssigneeAdapter(
     fun removeSelected() {
         chips.forEach { chip ->
             //if the filteredList users name or group name contains the chip text
-            if (chip is Chip && filteredList.any { it is Group && it.name == chip.text || it is GroupUser && it.username == chip.text }) {
-                //get the assignee from the list
-                val assigneeToRemove =
-                    filteredList.first { it is Group && it.name == chip.text || it is GroupUser && it.username == chip.text }
-                //remove assignee from filtered list
-                filteredList.remove(assigneeToRemove)
-                if (assigneeToRemove is Group) {
-                    assigneeToRemove.users.forEach { user ->
-                        filteredList.remove(user)
+            if(chip is Chip){
+                if(chip.tag == "com.example.everytask.models.response.groups.GroupUser"){
+                    assigneeList.forEach {
+                        if (it is GroupUser && it.username == chip.text) {
+                            filteredList.remove(it)
+                        }
+                    }
+                }else if(chip.tag == "com.example.everytask.models.response.groups.Group"){
+                    assigneeList.forEach {
+                        if (it is Group && it.name == chip.text) {
+                            filteredList.remove(it)
+                            it.users.forEach { user ->
+                                filteredList.remove(user)
+                            }
+                        }
                     }
                 }
             }
@@ -152,8 +161,10 @@ class AssigneeAdapter(
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun sort() {
         //sort the filtered list first by type (group or user) and then alphabetically
         filteredList.sortWith(compareBy({ it !is Group }, { if (it is Group) it.name else (it as GroupUser).username }))
+        notifyDataSetChanged()
     }
 }
