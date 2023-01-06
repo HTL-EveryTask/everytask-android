@@ -6,6 +6,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
+    <ImageView
+        android:id="@+id/iv_groupIcon"
+        android:layout_width="100sp"
+        android:layout_height="100sp"
+        android:layout_marginTop="10sp"
+        android:src="@drawable/ic_baseline_groups_24"
+        android:layout_gravity="center_horizontal"/>
+
     <LinearLayout
         android:id="@+id/ll_nameContainer"
         android:layout_width="match_parent"

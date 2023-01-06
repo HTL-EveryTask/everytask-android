@@ -62,15 +62,16 @@ class SettingsFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val uri = result.data?.data
                 try {
-                    var bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
+                    val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, uri)
                     //TODO: resize image if greater than 2MB
                     val stream = ByteArrayOutputStream()
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
                     val byteArray = stream.toByteArray()
-                    val encoded = Base64.encodeToString(byteArray, Base64.DEFAULT)
+                    var encoded = Base64.encodeToString(byteArray, Base64.DEFAULT)
                     Log.d("TAG", "byteCount: ${bitmap.byteCount}")
                     Log.d("TAG", "encoded: $encoded")
                     binding.ivProfilePicture.setImageBitmap(bitmap)
+                    encoded = encoded.replace("\\s".toRegex(), "")
                     changeProfilePicture(encoded)
                 } catch (e: Exception) {
                     Log.e("SettingsFragment", e.toString())
@@ -125,9 +126,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun changeProfilePicture(encoded: String) {
-        //remove all spaces and new lines
-        val encodedWithoutSpaces = encoded.replace("\\s".toRegex(), "")
-        val retrofitData = retrofitBuilder.changeProfilePicture(TOKEN, mapOf("picture" to encodedWithoutSpaces))
+        val retrofitData = retrofitBuilder.changeProfilePicture(TOKEN, mapOf("picture" to encoded))
         retrofitData.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
                 if (response.isSuccessful) {
