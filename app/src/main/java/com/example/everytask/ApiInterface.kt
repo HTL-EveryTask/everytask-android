@@ -1,10 +1,10 @@
 package com.example.everytask
 
-import com.example.everytask.models.response.tasks.Task
 import com.example.everytask.models.call.*
 import com.example.everytask.models.response.Default
 import retrofit2.Call
 import retrofit2.http.*
+
 
 interface ApiInterface {
 
@@ -34,6 +34,12 @@ interface ApiInterface {
     @GET("user")
     fun getUserData(
         @Header("Authorization") token: String
+    ): Call<Default>
+
+    @PATCH("user/picture")
+    fun changeProfilePicture(
+        @Header("Authorization") token: String,
+        @Body body: Map<String,String>
     ): Call<Default>
 
     @POST("verification/send")
