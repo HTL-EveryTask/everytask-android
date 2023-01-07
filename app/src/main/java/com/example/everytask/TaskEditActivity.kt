@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -76,11 +77,28 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
         pickDate()
 
+        //disable textinputlayout
+        binding.editTask.etAssignees.inputType = 0
+
         //set all the values
         task = getSerializable(this, "TASK", Task::class.java)
         binding.editTask.etTitle.setText(task.title)
         binding.editTask.etDescription.setText(task.description)
         binding.editTask.etDueDate.setText(task.due_time)
+        for (i in task.assigned_groups.sortedBy { it.name } + task.assigned_users.sortedBy { it.username }) {
+            val assigneeName =
+                if (i is AssignedUser) i.username else (i as AssignedGroup).name
+            //Map classname if assignee is AssignedUser or AssignedGroup to full classname
+            val assigneeClass =
+                if (i is AssignedUser) GroupUser::class.java.name else Group::class.java.name
+            createChip(
+                this,
+                assigneeName,
+                assigneeClass,
+                binding.editTask.flAssigneeContainer,
+                null
+            )
+        }
         //set saved values
         savedDay = task.due_time.split("-")[2].split(" ")[0].toInt()
         savedMonth = task.due_time.split("-")[1].toInt()
@@ -158,16 +176,17 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                 if (assignee is Chip) {
                     if (assignee.tag == GroupUser::class.java.name) {
                         //if assignee is already in assignees from task
-                        if(task.assigned_users.any { it.username == assignee.text }) {
+                        if (task.assigned_users.any { it.username == assignee.text }) {
                             assignedUsers.add(task.assigned_users.find { it.username == assignee.text }!!.id)
                         } else {
-                            assignees.first { it is GroupUser && it.username == assignee.text }.let {
-                                assignedUsers.add((it as GroupUser).id)
-                            }
+                            assignees.first { it is GroupUser && it.username == assignee.text }
+                                .let {
+                                    assignedUsers.add((it as GroupUser).id)
+                                }
                         }
-                    } else if(assignee.tag == Group::class.java.name) {
+                    } else if (assignee.tag == Group::class.java.name) {
                         //if assignee is already in assignees from task
-                        if(task.assigned_groups.any { it.name == assignee.text }) {
+                        if (task.assigned_groups.any { it.name == assignee.text }) {
                             assignedGroups.add(task.assigned_groups.find { it.name == assignee.text }!!.id)
                         } else {
                             assignees.first { it is Group && it.name == assignee.text }.let {
@@ -249,7 +268,7 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         for (group in groups) {
             assigneeList.add(group)
             for (user in group.users) {
-                if (!assigneeList.contains(user)) {
+                if (assigneeList.find { it is GroupUser && it.id == user.id } == null) {
                     assigneeList.add(user)
                 }
             }
@@ -268,7 +287,7 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
         Log.d("TAG", filteredList.toString())
 
-        binding.editTask.tvAssignee.setOnClickListener(View.OnClickListener {
+        binding.editTask.etAssignees.setOnClickListener(View.OnClickListener {
             val dialog = Dialog(this)
             //call removeView to remove the view from the parent
             (dialogBinding.root.parent as ViewGroup?)?.removeView(dialogBinding.root)
@@ -282,7 +301,11 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             dialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.show()
 
-            filteredList.sortWith(compareBy({ it !is Group }, { if (it is Group) it.name else (it as GroupUser).username }))
+            filteredList.sortWith(
+                compareBy(
+                    { it !is Group },
+                    { if (it is Group) it.name else (it as GroupUser).username })
+            )
 
             val adapter = AssigneeAdapter(
                 this,
@@ -318,7 +341,7 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                         //remove group from filteredList
                         filteredList.remove(group)
                         //remove all users from filteredList
-                        if(group != null) {
+                        if (group != null) {
                             for (user in (group as Group).users) {
                                 filteredList.remove(user)
                             }
@@ -329,6 +352,25 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                         Log.d("TAG", "i: $i")
                         filteredList.remove(user)
                     }
+                }
+            }
+
+            //when the dialog is dismissed, update the assignee chips
+            dialog.setOnDismissListener {
+                binding.editTask.flAssigneeContainer.removeViews(
+                    0,
+                    binding.editTask.flAssigneeContainer.childCount - 1
+                )
+                //add the chips to the assignee container
+                for (i in 0 until dialogBinding.flAssigneeContainer.childCount - 1) {
+                    val assignee = dialogBinding.flAssigneeContainer.getChildAt(i) as Chip
+                    createChip(
+                        this,
+                        assignee.text.toString(),
+                        assignee.tag.toString(),
+                        binding.editTask.flAssigneeContainer,
+                        null
+                    )
                 }
             }
         })

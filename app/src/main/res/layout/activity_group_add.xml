@@ -26,6 +26,41 @@
                 android:id="@+id/edit_group"
                 layout="@layout/edit_group" />
 
+            <LinearLayout
+                android:id="@+id/ll_memberContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="15sp">
+
+                <TextView
+                    android:id="@+id/tv_memberLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/et_name"
+                    android:text="Members" />
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/fl_memberContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    app:flexWrap="wrap"
+                    app:alignItems="stretch"
+                    app:alignContent="space_around"
+                    app:showDivider="beginning|middle|end"
+                    app:dividerDrawable="@drawable/ic_divider">
+
+                    <EditText
+                        android:id="@+id/et_members"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/gray"
+                        app:layout_flexGrow="1" />
+                </com.google.android.flexbox.FlexboxLayout>
+
+            </LinearLayout>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_create"
                 android:layout_width="wrap_content"

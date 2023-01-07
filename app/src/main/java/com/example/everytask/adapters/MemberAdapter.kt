@@ -8,12 +8,12 @@ import com.example.everytask.GroupEditActivity
 import com.example.everytask.databinding.RowMembersBinding
 import com.example.everytask.models.response.groups.GroupUser
 
-class MemberAdapter(val userList: List<GroupUser>, val isAdmin: Boolean, val groupEditActivity: GroupEditActivity): RecyclerView.Adapter<MemberAdapter.MemberViewHolder>() {
+class MemberAdapter(val userList: List<GroupUser>, val currentUser: GroupUser,val groupEditActivity: GroupEditActivity): RecyclerView.Adapter<MemberAdapter.MemberViewHolder>() {
 
     class MemberViewHolder(
         val rowMembersBinding: RowMembersBinding,
         val groupEditActivity: GroupEditActivity,
-        val isAdmin: Boolean
+        val currentUser: GroupUser
     ): RecyclerView.ViewHolder(rowMembersBinding.root){
         fun bind(user: GroupUser){
             rowMembersBinding.tvUsername.text = user.username
@@ -23,7 +23,7 @@ class MemberAdapter(val userList: List<GroupUser>, val isAdmin: Boolean, val gro
             else{
                 rowMembersBinding.ivAdmin.visibility = View.GONE
             }
-            if(isAdmin){
+            if(currentUser.is_admin && user.id != currentUser.id){
                 //on long press, show the option to remove the user
                 rowMembersBinding.root.setOnLongClickListener{
                     groupEditActivity.showEditUserDialog(user)
@@ -37,7 +37,7 @@ class MemberAdapter(val userList: List<GroupUser>, val isAdmin: Boolean, val gro
         return MemberViewHolder(
             RowMembersBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             groupEditActivity,
-            isAdmin
+            currentUser
         )
     }
 

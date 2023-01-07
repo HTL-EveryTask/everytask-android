@@ -28,7 +28,7 @@ interface ApiInterface {
     @PATCH("user")
     fun changeUsername(
         @Header("Authorization") token: String,
-        @Body body: Map<String,String>
+        @Body body: Map<String, String>
     ): Call<Default>
 
     @GET("user")
@@ -39,18 +39,18 @@ interface ApiInterface {
     @PATCH("user/picture")
     fun changeProfilePicture(
         @Header("Authorization") token: String,
-        @Body body: Map<String,String>
+        @Body body: Map<String, String>
     ): Call<Default>
 
     @POST("verification/send")
     fun sendVerificationMail(
-        @Body body: Map<String,String>
+        @Body body: Map<String, String>
     ): Call<Default>
 
     @HTTP(method = "DELETE", path = "user", hasBody = true)
     fun deleteAccount(
         @Header("Authorization") token: String,
-        @Body body: Map<String,String>
+        @Body body: Map<String, String>
     ): Call<Default>
 
     @PATCH("password")
@@ -61,7 +61,7 @@ interface ApiInterface {
 
     @POST("password")
     fun sendPasswordResetMail(
-        @Body body: Map<String,String>
+        @Body body: Map<String, String>
     ): Call<Default>
 
     // TASKS --------------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ interface ApiInterface {
     fun toggleDone(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
-        @Body body: Map<String,Boolean>
+        @Body body: Map<String, Boolean>
     ): Call<Default>
 
     @PATCH("task/{id}")
@@ -145,6 +145,27 @@ interface ApiInterface {
     fun lockGroup(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
+    ): Call<Default>
+
+    @PUT("group/{id}/admin")
+    fun addAdmin(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body body: Map<String, Int>
+    ): Call<Default>
+
+    @HTTP(method = "DELETE", path = "group/{id}/admin", hasBody = true)
+    fun removeAdmin(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body body: Map<String, Int>
+    ): Call<Default>
+
+    @HTTP(method = "DELETE", path = "group/{id}/kick", hasBody = true)
+    fun kickUser(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body body: Map<String, Int>
     ): Call<Default>
 
     // CONNECTIONS --------------------------------------------------------------------------------------------

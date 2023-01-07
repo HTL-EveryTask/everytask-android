@@ -1,5 +1,6 @@
 package com.example.everytask
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ClipData
@@ -40,6 +41,8 @@ class GroupEditActivity : AppCompatActivity() {
     private lateinit var group: Group
     private lateinit var userId: String
     private var encodedPicture: String? = null
+    private lateinit var members: MutableList<GroupUser>
+    private lateinit var memberAdapter: MemberAdapter
 
     private lateinit var binding: ActivityGroupEditBinding
 
@@ -118,9 +121,10 @@ class GroupEditActivity : AppCompatActivity() {
         //set all the values
         binding.editGroup.etName.setText(group.name)
         binding.editGroup.etDescription.setText(group.description)
-        val sorted = group.users.sortedWith(compareBy({ it.id != userId.toInt() }, { !it.is_admin }, { it.username }))
-        val adapter = MemberAdapter(sorted, user.is_admin, this)
-        binding.rvMembers.adapter = adapter
+        members = group.users.sortedWith(compareBy({ it.id != userId.toInt() }, { !it.is_admin }, { it.username }))
+            .toMutableList()
+        memberAdapter = MemberAdapter(members, user, this)
+        binding.rvMembers.adapter = memberAdapter
         binding.etInviteLink.inputType = 0
 
         if(group.picture != "") {
@@ -273,16 +277,86 @@ class GroupEditActivity : AppCompatActivity() {
     fun showEditUserDialog(user: GroupUser) {
         val dialog = BottomSheetDialog(this)
         val binding = DialogEditUserBinding.inflate(layoutInflater)
+        if(user.is_admin) {
+            binding.tvMakeAdmin.text = "Remove Admin"
+        }
         binding.tvKickMember.setOnClickListener {
-            //TODO kick member
+            val call = retrofitBuilder.kickUser(TOKEN, group.id, mapOf("id" to user.id))
+            call.enqueue(object : Callback<Default> {
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onResponse(
+                    call: Call<Default>,
+                    response: Response<Default>
+                ) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@GroupEditActivity, "User kicked", Toast.LENGTH_SHORT).show()
+                        members.removeIf { it.id == user.id }
+                        memberAdapter.notifyDataSetChanged()
+                        dialog.dismiss()
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<Default>,
+                    t: Throwable
+                ) {
+                    Toast.makeText(
+                        this@GroupEditActivity,
+                        "No connection to server",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
             dialog.dismiss()
         }
         binding.tvMakeAdmin.setOnClickListener {
-            //TODO make admin
+            if(user.is_admin) {
+                val call = retrofitBuilder.removeAdmin(TOKEN, group.id, mapOf("id" to user.id))
+                call.enqueue(object : Callback<Default> {
+                    override fun onResponse(call: Call<Default>, response: Response<Default>) {
+                        if (response.isSuccessful) {
+                            Toast.makeText(this@GroupEditActivity, "Admin Removed", Toast.LENGTH_SHORT).show()
+                            members.find { it.id == user.id }?.is_admin = false
+                            sortMembers()
+                            dialog.dismiss()
+                        } else {
+                            Log.d("TAG", "onResponse: ${response.errorBody()}")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Default>, t: Throwable) {
+                        Log.d("TAG", "onFailure: ${t.message}")
+                    }
+                })
+            } else {
+                val call = retrofitBuilder.addAdmin(TOKEN, group.id, mapOf("id" to user.id))
+                call.enqueue(object : Callback<Default> {
+                    override fun onResponse(call: Call<Default>, response: Response<Default>) {
+                        if (response.isSuccessful) {
+                            Toast.makeText(this@GroupEditActivity, "Admin Added", Toast.LENGTH_SHORT).show()
+                            //make user admin in members
+                            members.find { it.id == user.id }?.is_admin = true
+                            sortMembers()
+                            dialog.dismiss()
+                        } else {
+                            Log.d("TAG", "onResponse: ${response.errorBody()}")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Default>, t: Throwable) {
+                        Log.d("TAG", "onFailure: ${t.message}")
+                    }
+                })
+            }
             dialog.dismiss()
         }
         dialog.setContentView(binding.root)
         dialog.show()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun sortMembers() {
+        members.sortWith(compareBy({ it.id != userId.toInt() }, { !it.is_admin }, { it.username }))
+        memberAdapter.notifyDataSetChanged()
+    }
 }

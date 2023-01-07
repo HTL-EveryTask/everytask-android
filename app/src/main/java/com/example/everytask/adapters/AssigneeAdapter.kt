@@ -5,8 +5,10 @@ import android.app.Activity
 import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import com.example.everytask.createChip
@@ -32,8 +34,12 @@ class AssigneeAdapter(
         fun bind(assignee: Serializable) {
             if (assignee is GroupUser) {
                 assigneeBinding.tvAssignee.text = assignee.username
+                assigneeBinding.ivGroupPicture.visibility = View.GONE
+                assigneeBinding.ivUserPicture.visibility = View.VISIBLE
             } else if (assignee is Group) {
                 assigneeBinding.tvAssignee.text = assignee.name
+                assigneeBinding.ivUserPicture.visibility = View.GONE
+                assigneeBinding.ivGroupPicture.visibility = View.VISIBLE
             }
         }
     }
@@ -80,7 +86,7 @@ class AssigneeAdapter(
     override fun onBindViewHolder(holder: AssigneeViewHolder, position: Int) {
         val assignee = filteredList[position]
         holder.bind(assignee)
-        holder.assigneeBinding.clAsigneeContainer.setOnClickListener {
+        holder.assigneeBinding.clAssigneeContainer.setOnClickListener {
             val assigneeName =
                 if (assignee is GroupUser) assignee.username else (assignee as Group).name
 
@@ -112,7 +118,7 @@ class AssigneeAdapter(
 
             if(type == "com.example.everytask.models.response.groups.GroupUser"){
                 assigneeList.forEach {
-                    if (it is GroupUser && it.username == assignee && !filteredList.contains(it)) {
+                    if (it is GroupUser && it.username == assignee && filteredList.find { i -> i is GroupUser && i.id == it.id } == null) {
                         filteredList.add(it)
                     }
                 }
@@ -121,7 +127,7 @@ class AssigneeAdapter(
                     if (it is Group && it.name == assignee && !filteredList.contains(it)) {
                         filteredList.add(it)
                         it.users.forEach { user ->
-                            if (!filteredList.contains(user)) {
+                            if (filteredList.find { i -> i is GroupUser && i.id == user.id } == null) {
                                 filteredList.add(user)
                             }
                         }

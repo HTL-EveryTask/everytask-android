@@ -67,6 +67,8 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
         val actionbar = supportActionBar!!
         actionbar.title = "Add Task"
         actionbar.setDisplayHomeAsUpEnabled(true)
+        
+        binding.editTask.etAssignees.inputType = 0
 
         pickDate()
 
@@ -226,7 +228,7 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
 
         Log.d("TAG", filteredList.toString())
 
-        binding.editTask.tvAssignee.setOnClickListener(View.OnClickListener {
+        binding.editTask.etAssignees.setOnClickListener(View.OnClickListener {
             val dialog = Dialog(this)
             //call removeView to remove the view from the parent
             (dialogBinding.root.parent as ViewGroup?)?.removeView(dialogBinding.root)
@@ -253,6 +255,25 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
                 dialogBinding.flAssigneeContainer
             )
             dialogBinding.rvAssignees.adapter = adapter
+
+            //when the dialog is dismissed, update the assignee chips
+            dialog.setOnDismissListener {
+                binding.editTask.flAssigneeContainer.removeViews(
+                    0,
+                    binding.editTask.flAssigneeContainer.childCount - 1
+                )
+                //add the chips to the assignee container
+                for (i in 0 until dialogBinding.flAssigneeContainer.childCount - 1) {
+                    val assignee = dialogBinding.flAssigneeContainer.getChildAt(i) as Chip
+                    createChip(
+                        this,
+                        assignee.text.toString(),
+                        assignee.tag.toString(),
+                        binding.editTask.flAssigneeContainer,
+                        null
+                    )
+                }
+            }
         })
     }
 }
