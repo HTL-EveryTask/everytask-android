@@ -135,13 +135,14 @@ internal fun validEmail(email: String): String? {
     }
 }
 
-internal fun createChip(context: Context, person: String, type: String, chipGroup: FlexboxLayout, adapter: AssigneeAdapter?) {
+internal fun createChip(context: Context, assignee: Serializable, chipGroup: FlexboxLayout, adapter: AssigneeAdapter?) {
     val chip = Chip(context)
-    chip.text = person
-    chip.tag = type
-    if(type == GroupUser::class.java.name) {
+    chip.tag = assignee
+    if(assignee is GroupUser) {
+        chip.text = assignee.username
         chip.chipIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_person_outline_24)
-    } else {
+    } else if(assignee is Group) {
+        chip.text = assignee.name
         chip.chipIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_groups_24)
     }
     chip.isClickable = false
@@ -151,7 +152,7 @@ internal fun createChip(context: Context, person: String, type: String, chipGrou
     if(adapter != null) {
         chip.setOnCloseIconClickListener {
             chipGroup.removeView(chip as View)
-            adapter.addAssignee(person, type)
+            adapter.addAssignee(assignee)
         }
     }else{
         chip.isCloseIconVisible = false

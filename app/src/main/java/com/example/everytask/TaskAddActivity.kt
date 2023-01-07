@@ -28,6 +28,7 @@ import com.google.android.material.chip.Chip
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.Serializable
 import java.util.*
 
 class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
@@ -123,6 +124,9 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
     }
 
     fun addTask(view: View) {
+        //disable button
+        binding.btnSave.isEnabled = false
+
         val title = binding.editTask.etTitle.text.toString()
         val description = binding.editTask.etDescription.text.toString()
         val dueDate = "$savedYear-$savedMonth-$savedDay $savedHour:$savedMinute:00"
@@ -148,14 +152,10 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
             for (i in 0 until dialogBinding.flAssigneeContainer.childCount) {
                 val assignee = dialogBinding.flAssigneeContainer.getChildAt(i)
                 if (assignee is Chip) {
-                    if (assignee.tag == GroupUser::class.java.name) {
-                        assignees.first { it is GroupUser && it.username == assignee.text }.let {
-                            assignedUsers.add((it as GroupUser).id)
-                        }
-                    } else if (assignee.tag == Group::class.java.name) {
-                        assignees.first { it is Group && it.name == assignee.text }.let {
-                            assignedGroups.add((it as Group).id)
-                        }
+                    if (assignee.tag is GroupUser) {
+                        assignedUsers.add((assignee.tag as GroupUser).id)
+                    } else if (assignee.tag is Group) {
+                        assignedGroups.add((assignee.tag as Group).id)
                     }
                 }
             }
@@ -180,6 +180,8 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
             override fun onFailure(call: Call<Default>, t: Throwable) {
                 Toast.makeText(this@TaskAddActivity, "No connection to server", Toast.LENGTH_SHORT)
                     .show()
+                //enable button
+                binding.btnSave.isEnabled = true
                 Log.d("TAG", t.message.toString())
             }
         })
@@ -213,7 +215,7 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
         for (group in groups) {
             assigneeList.add(group)
             for (user in group.users) {
-                if (!assigneeList.contains(user)) {
+                if (assigneeList.find { it is GroupUser && it.id == user.id } == null) {
                     assigneeList.add(user)
                 }
             }
@@ -267,8 +269,7 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
                     val assignee = dialogBinding.flAssigneeContainer.getChildAt(i) as Chip
                     createChip(
                         this,
-                        assignee.text.toString(),
-                        assignee.tag.toString(),
+                        assignee.tag as Serializable,
                         binding.editTask.flAssigneeContainer,
                         null
                     )

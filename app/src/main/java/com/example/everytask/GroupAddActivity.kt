@@ -36,6 +36,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
+import java.io.Serializable
 import java.util.*
 
 
@@ -163,15 +164,13 @@ class GroupAddActivity : AppCompatActivity() {
                         if (binding.flMemberContainer.childCount == 1) {
                             createChip(
                                 this,
-                                user.username,
-                                GroupUser::class.java.name,
+                                user,
                                 binding.flMemberContainer,
                                 null
                             )
                             createChip(
                                 this,
-                                user.username,
-                                GroupUser::class.java.name,
+                                user,
                                 dialogBinding.flAssigneeContainer,
                                 null
                             )
@@ -231,8 +230,7 @@ class GroupAddActivity : AppCompatActivity() {
                     val member = dialogBinding.flAssigneeContainer.getChildAt(i) as Chip
                     createChip(
                         this,
-                        member.text.toString(),
-                        member.tag.toString(),
+                        member.tag as Serializable,
                         binding.flMemberContainer,
                         null
                     )

@@ -87,8 +87,6 @@ class AssigneeAdapter(
         val assignee = filteredList[position]
         holder.bind(assignee)
         holder.assigneeBinding.clAssigneeContainer.setOnClickListener {
-            val assigneeName =
-                if (assignee is GroupUser) assignee.username else (assignee as Group).name
 
             //if assignee is group remove all chips of the users in the group
             if (assignee is Group) {
@@ -101,7 +99,7 @@ class AssigneeAdapter(
                 }
             }
             Log.d("TAG", "Class: ${assignee.javaClass.name}")
-            createChip(activity, assigneeName,assignee.javaClass.name, chipGroup, this)
+            createChip(activity, assignee, chipGroup, this)
             //remove assignee from list
             removeSelected()
         }
@@ -112,24 +110,22 @@ class AssigneeAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun addAssignee(assignee: String, type: String) {
+    fun addAssignee(assignee: Serializable) {
+        //get name
+        val assigneeName =
+            if (assignee is Group) assignee.name else (assignee as GroupUser).username
         //if assignee contains search
-        if (assignee.contains(search.text.toString(), true)) {
-
-            if(type == "com.example.everytask.models.response.groups.GroupUser"){
-                assigneeList.forEach {
-                    if (it is GroupUser && it.username == assignee && filteredList.find { i -> i is GroupUser && i.id == it.id } == null) {
-                        filteredList.add(it)
-                    }
+        if (assigneeName.contains(search.text.toString(), true)) {
+            if (assignee is GroupUser) {
+                if (filteredList.find { i -> i is GroupUser && i.id == assignee.id } == null) {
+                    filteredList.add(assignee)
                 }
-            }else if(type == "com.example.everytask.models.response.groups.Group"){
-                assigneeList.forEach {
-                    if (it is Group && it.name == assignee && !filteredList.contains(it)) {
-                        filteredList.add(it)
-                        it.users.forEach { user ->
-                            if (filteredList.find { i -> i is GroupUser && i.id == user.id } == null) {
-                                filteredList.add(user)
-                            }
+            } else if (assignee is Group) {
+                if (!filteredList.contains(assignee)) {
+                    filteredList.add(assignee)
+                    assignee.users.forEach { user ->
+                        if (filteredList.find { i -> i is GroupUser && i.id == user.id } == null) {
+                            filteredList.add(user)
                         }
                     }
                 }
@@ -144,21 +140,21 @@ class AssigneeAdapter(
     fun removeSelected() {
         chips.forEach { chip ->
             //if the filteredList users name or group name contains the chip text
-            if(chip is Chip){
-                if(chip.tag == "com.example.everytask.models.response.groups.GroupUser"){
-                    assigneeList.forEach {
-                        if (it is GroupUser && it.username == chip.text) {
-                            filteredList.remove(it)
+            if (chip is Chip) {
+                if (chip.tag is GroupUser) {
+                    filteredList.removeAll(
+                        filteredList.filter {
+                            it is GroupUser && it.id == (chip.tag as GroupUser).id
                         }
-                    }
-                }else if(chip.tag == "com.example.everytask.models.response.groups.Group"){
-                    assigneeList.forEach {
-                        if (it is Group && it.name == chip.text) {
-                            filteredList.remove(it)
-                            it.users.forEach { user ->
-                                filteredList.remove(user)
+                    )
+                } else if (chip.tag is Group) {
+                    filteredList.remove(chip.tag)
+                    (chip.tag as Group).users.forEach { user ->
+                        filteredList.removeAll(
+                            filteredList.filter {
+                                it is GroupUser && it.id == user.id
                             }
-                        }
+                        )
                     }
                 }
             }
@@ -170,7 +166,11 @@ class AssigneeAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun sort() {
         //sort the filtered list first by type (group or user) and then alphabetically
-        filteredList.sortWith(compareBy({ it !is Group }, { if (it is Group) it.name else (it as GroupUser).username }))
+        filteredList.sortWith(
+            compareBy(
+                { it !is Group },
+                { if (it is Group) it.name else (it as GroupUser).username })
+        )
         notifyDataSetChanged()
     }
 }
