@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.example.everytask.databinding.ActivityMainBinding
-import com.example.everytask.fragments.ConnectionsFragment
+import com.example.everytask.fragments.AppointmentsFragment
 import com.example.everytask.fragments.GroupsFragment
 import com.example.everytask.fragments.HomeFragment
 import com.example.everytask.fragments.SettingsFragment
@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
 
     private val homeFragment = HomeFragment()
     private val groupsFragment = GroupsFragment()
-    private val connectionsFragment = ConnectionsFragment()
+    private val appointmentsFragment = AppointmentsFragment()
     private val settingsFragment = SettingsFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.home -> replaceFragment(homeFragment)
                 R.id.groups -> replaceFragment(groupsFragment)
-                R.id.connections -> replaceFragment(connectionsFragment)
+                R.id.appointments -> replaceFragment(appointmentsFragment)
                 R.id.settings -> replaceFragment(settingsFragment)
             }
             true

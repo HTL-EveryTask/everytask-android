@@ -16,9 +16,9 @@
         tools:targetApi="o" />
 
     <item
-        android:id="@+id/it_connections"
-        android:title="@string/connections"
-        android:icon="@drawable/ic_baseline_connections_24"
+        android:id="@+id/it_appointments"
+        android:title="Appointments"
+        android:icon="@drawable/ic_baseline_appointments_24"
         android:iconTint="@color/raisin"
         tools:targetApi="o"/>
 

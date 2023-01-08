@@ -6,48 +6,45 @@ import android.app.Dialog
 import android.app.TimePickerDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.DatePicker
+import android.widget.TimePicker
+import android.widget.Toast
 import com.example.everytask.adapters.AssigneeAdapter
-import com.example.everytask.adapters.GroupAdapter
-import com.example.everytask.databinding.ActivityTaskEditBinding
+import com.example.everytask.databinding.ActivityAppointmentAddBinding
+import com.example.everytask.databinding.ActivityTaskAddBinding
 import com.example.everytask.databinding.DialogSearchableSpinnerBinding
-import com.example.everytask.fragments.GroupsFragment
+import com.example.everytask.models.call.AppointmentInfo
 import com.example.everytask.models.call.TaskInfo
+import com.example.everytask.models.response.tasks.Task
 import com.example.everytask.models.response.Default
-import com.example.everytask.models.response.User
 import com.example.everytask.models.response.groups.Group
 import com.example.everytask.models.response.groups.GroupUser
 import com.example.everytask.models.response.tasks.AssignedGroup
 import com.example.everytask.models.response.tasks.AssignedUser
-import com.example.everytask.models.response.tasks.Task
 import com.google.android.material.chip.Chip
-import kotlinx.android.synthetic.main.dialog_searchable_spinner.*
+import com.google.android.material.textfield.TextInputEditText
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.Serializable
 import java.util.*
-import kotlin.collections.ArrayList
 
-
-class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
+class AppointmentAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
 
     private lateinit var TOKEN: String
 
-    private lateinit var task: Task
-
     private lateinit var groups: List<Group>
 
     private lateinit var assignees: List<java.io.Serializable>
+
+    private lateinit var timePicker: TextInputEditText
 
     var day = 0
     var month = 0
@@ -61,13 +58,13 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     var savedHour = 0
     var savedMinute = 0
 
-    private lateinit var binding: ActivityTaskEditBinding
+    private lateinit var binding: ActivityAppointmentAddBinding
     private lateinit var dialogBinding: DialogSearchableSpinnerBinding
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityTaskEditBinding.inflate(layoutInflater)
+        binding = ActivityAppointmentAddBinding.inflate(layoutInflater)
         dialogBinding = DialogSearchableSpinnerBinding.inflate(layoutInflater)
 
         TOKEN = sharedPreferences.getString("TOKEN", null)!!
@@ -75,61 +72,44 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         setContentView(binding.root)
 
         val actionbar = supportActionBar!!
-        actionbar.title = "Edit Task"
+        actionbar.title = "Add Appointment"
         actionbar.setDisplayHomeAsUpEnabled(true)
-
-        pickDate()
-
-        //disable textinputlayout
-        binding.editTask.etAssignees.inputType = 0
-
-        //set all the values
-        task = getSerializable(this, "TASK", Task::class.java)
-        binding.editTask.etTitle.setText(task.title)
-        binding.editTask.etDescription.setText(task.description)
-        binding.editTask.etDueDate.setText(task.due_time)
-
-        //set tags
-        for (tag in task.tags) {
-            val chip = Chip(this)
-            chip.text = tag
-            chip.isCloseIconVisible = true
-            chip.isClickable = false
-            chip.setOnCloseIconClickListener {
-                binding.editTask.lvTagContainer.removeView(chip)
-                binding.editTask.etTag.error = null
-            }
-            binding.editTask.lvTagContainer.addView(chip)
-        }
-
-        //set saved values
-        savedDay = task.due_time.split("-")[2].split(" ")[0].toInt()
-        savedMonth = task.due_time.split("-")[1].toInt()
-        savedYear = task.due_time.split("-")[0].toInt()
-        savedHour = task.due_time.split(" ")[1].split(":")[0].toInt()
-        savedMinute = task.due_time.split(":")[1].toInt()
+        
+        binding.editAppointment.etAssignees.inputType = 0
 
         //set on enter listener
-        binding.editTask.etTag.setImeActionLabel("Add", EditorInfo.IME_ACTION_NEXT)
-        binding.editTask.etTag.setOnEditorActionListener { _, actionId, _ ->
-            if(binding.editTask.lvTagContainer.childCount < 5){
+        binding.editAppointment.etTag.setImeActionLabel("Add", EditorInfo.IME_ACTION_NEXT)
+        binding.editAppointment.etTag.setOnEditorActionListener { _, actionId, _ ->
+            if(binding.editAppointment.lvTagContainer.childCount < 5){
                 if (actionId == EditorInfo.IME_ACTION_DONE|| actionId == EditorInfo.IME_ACTION_NEXT) {
                     val chip = Chip(this)
-                    chip.text = binding.editTask.etTag.text.toString()
+                    chip.text = binding.editAppointment.etTag.text.toString()
                     chip.isCloseIconVisible = true
                     chip.isClickable = false
                     chip.setOnCloseIconClickListener {
-                        binding.editTask.lvTagContainer.removeView(chip)
-                        binding.editTask.etTag.error = null
+                        binding.editAppointment.lvTagContainer.removeView(chip)
+                        binding.editAppointment.etTag.error = null
                     }
-                    binding.editTask.lvTagContainer.addView(chip)
-                    binding.editTask.etTag.text?.clear()
+                    binding.editAppointment.lvTagContainer.addView(chip)
+                    binding.editAppointment.etTag.text?.clear()
                 }
             }else{
-                binding.editTask.etTag.error = "You can only add 5 tags"
+                binding.editAppointment.etTag.error = "You can only add 5 tags"
             }
             true
         }
+
+        pickDate()
+
+        getDateTimeCalendar()
+        //set all saved values
+        savedDay = day
+        savedMonth = month
+        savedYear = year
+        savedHour = hour
+        savedMinute = minute
+        binding.editAppointment.etStartTime.setText("$savedYear-$savedMonth-$savedDay $savedHour:$savedMinute:00")
+        binding.editAppointment.etEndTime.setText("$savedYear-$savedMonth-$savedDay $savedHour:$savedMinute:00")
 
         getGroups()
     }
@@ -144,7 +124,13 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     }
 
     private fun pickDate() {
-        binding.editTask.etDueDate.setOnClickListener {
+        binding.editAppointment.etStartTime.setOnClickListener {
+            timePicker = binding.editAppointment.etStartTime
+            getDateTimeCalendar()
+            DatePickerDialog(this, this, year, month, day).show()
+        }
+        binding.editAppointment.etEndTime.setOnClickListener {
+            timePicker = binding.editAppointment.etEndTime
             getDateTimeCalendar()
             DatePickerDialog(this, this, year, month, day).show()
         }
@@ -170,33 +156,37 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
         savedHour = hourOfDay
         savedMinute = minute
-        binding.editTask.etDueDate.setText("$savedDay/$savedMonth/$savedYear $savedHour:$savedMinute")
+
+        timePicker.setText("$savedYear-$savedMonth-$savedDay $savedHour:$savedMinute:00")
     }
 
-    fun updateTask(view: View) {
-        val title = binding.editTask.etTitle.text.toString()
-        val description = binding.editTask.etDescription.text.toString()
-        val dueDate = "$savedYear-$savedMonth-$savedDay $savedHour:$savedMinute:00"
+    fun addAppointment(view: View) {
+        //disable button
+        binding.btnSave.isEnabled = false
+
+        val title = binding.editAppointment.etTitle.text.toString()
+        val description = binding.editAppointment.etDescription.text.toString()
+        val startDate = binding.editAppointment.etStartTime.text.toString()
+        val endDate = binding.editAppointment.etEndTime.text.toString()
         val tags = mutableListOf<String>()
-        for (i in 0 until binding.editTask.lvTagContainer.childCount) {
-            tags.add((binding.editTask.lvTagContainer.getChildAt(i) as Chip).text.toString())
+        for (i in 0 until binding.editAppointment.lvTagContainer.childCount) {
+            tags.add((binding.editAppointment.lvTagContainer.getChildAt(i) as Chip).text.toString())
         }
-        Log.d("TAG", "updateTask: $tags")
 
         if (title.isEmpty()) {
-            binding.editTask.etTitle.error = "Title cannot be empty"
+            binding.editAppointment.etTitle.error = "Title cannot be empty"
             return
         }
         if (title.length > 32) {
-            binding.editTask.etTitle.error = "Title cannot be longer than 32 characters"
+            binding.editAppointment.etTitle.error = "Title cannot be longer than 32 characters"
             return
         }
         if (description.length > 300) {
-            binding.editTask.etDescription.error =
+            binding.editAppointment.etDescription.error =
                 "Description cannot be longer than 300 characters"
             return
         }
-        //get assignedUsers and assignedGroups from dialogBinding.flAssigneeContainer
+
         val assignedUsers = mutableListOf<Int>()
         val assignedGroups = mutableListOf<Int>()
         Log.d("TAG", "assignees: $assignees")
@@ -211,45 +201,29 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                     }
                 }
             }
-        } else {
-            //add all already assigned users
-            task.assigned_users.forEach {
-                assignedUsers.add(it.id)
-            }
-            //add all already assigned groups
-            task.assigned_groups.forEach {
-                assignedGroups.add(it.id)
-            }
         }
-        Log.d("TAG", "updateTask Users: $assignedUsers")
-        Log.d("TAG", "updateTask Groups: $assignedGroups")
 
+        val call = retrofitBuilder.addAppointment(
+            TOKEN,
+            AppointmentInfo(title, description, startDate, endDate, assignedUsers, assignedGroups, tags)
+        )
         Log.d(
             "TAG",
-            "editTask: ${TaskInfo(title, description, dueDate, assignedUsers, assignedGroups, tags)}"
-        )
-        val call = retrofitBuilder.updateTask(
-            TOKEN,
-            task.id, TaskInfo(title, description, dueDate, assignedUsers, assignedGroups, tags)
+            "addAppointment: ${AppointmentInfo(title, description, startDate, endDate, assignedUsers, assignedGroups, tags)}"
         )
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {
                 if (response.isSuccessful) {
                     Log.d("TAG", "onResponse: ${response.body()}")
                     finish()
-                } else {
-                    Log.d("TAG", "onResponse: ${response.errorBody()}")
-                    Toast.makeText(
-                        this@TaskEditActivity,
-                        "You are not the creator of this Task",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             }
 
             override fun onFailure(call: Call<Default>, t: Throwable) {
-                Toast.makeText(this@TaskEditActivity, "No connection to server", Toast.LENGTH_SHORT)
+                Toast.makeText(this@AppointmentAddActivity, "No connection to server", Toast.LENGTH_SHORT)
                     .show()
+                //enable button
+                binding.btnSave.isEnabled = true
                 Log.d("TAG", t.message.toString())
             }
         })
@@ -270,7 +244,7 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             }
 
             override fun onFailure(call: Call<Default>, t: Throwable) {
-                Toast.makeText(this@TaskEditActivity, "No connection to server", Toast.LENGTH_SHORT)
+                Toast.makeText(this@AppointmentAddActivity, "No connection to server", Toast.LENGTH_SHORT)
                     .show()
                 Log.d("TAG", "onFailure: ${t.message}")
             }
@@ -291,79 +265,17 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         assignees = assigneeList
     }
 
-    fun cancelTask(view: View) {
-        finish()
-    }
-
     fun initializeAssignables() {
         getAssignees(groups)
 
         val filteredList = assignees.sortedWith(compareBy { it !is AssignedGroup }).toMutableList()
-        filteredList.sortWith(
-            compareBy(
-                { it !is Group },
-                { if (it is Group) it.name else (it as GroupUser).username })
-        )
-
-        val adapter = AssigneeAdapter(
-            this,
-            assignees,
-            filteredList,
-            dialogBinding.etAssigneeSearch,
-            dialogBinding.flAssigneeContainer
-        )
-        dialogBinding.rvAssignees.adapter = adapter
-
-        //create chips for every currently assigned if flAssigneeContainer contains only one child
-        task.assigned_groups.forEach {
-            //get the group from the list of groups
-            val group = groups.find { group -> group.id == it.id }
-            if (group != null) {
-                createChip(
-                    this,
-                    group,
-                    binding.editTask.flAssigneeContainer,
-                    null
-                )
-                createChip(
-                    this,
-                    group,
-                    dialogBinding.flAssigneeContainer,
-                    adapter
-                )
-                filteredList.remove(group)
-                for (user in group.users) {
-                    filteredList.removeAll(filteredList.filter { it is GroupUser && it.id == user.id })
-                }
-            }
-        }
-        task.assigned_users.forEach {
-            //get the user from the list of users
-            val user = assignees.find { user -> user is GroupUser && user.id == it.id }
-            if (user != null) {
-                createChip(
-                    this,
-                    user,
-                    binding.editTask.flAssigneeContainer,
-                    null
-                )
-                createChip(
-                    this,
-                    user,
-                    dialogBinding.flAssigneeContainer,
-                    adapter
-                )
-            }
-            filteredList.remove(user)
-        }
 
         Log.d("TAG", filteredList.toString())
 
-        binding.editTask.etAssignees.setOnClickListener(View.OnClickListener {
+        binding.editAppointment.etAssignees.setOnClickListener(View.OnClickListener {
             val dialog = Dialog(this)
             //call removeView to remove the view from the parent
             (dialogBinding.root.parent as ViewGroup?)?.removeView(dialogBinding.root)
-
 
             dialog.setContentView(dialogBinding.root)
             dialog.getWindow()?.setLayout(
@@ -373,11 +285,26 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             dialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.show()
 
+            filteredList.sortWith(
+                compareBy(
+                    { it !is Group },
+                    { if (it is Group) it.name else (it as GroupUser).username })
+            )
+
+            val adapter = AssigneeAdapter(
+                this,
+                assignees,
+                filteredList,
+                dialogBinding.etAssigneeSearch,
+                dialogBinding.flAssigneeContainer
+            )
+            dialogBinding.rvAssignees.adapter = adapter
+
             //when the dialog is dismissed, update the assignee chips
             dialog.setOnDismissListener {
-                binding.editTask.flAssigneeContainer.removeViews(
+                binding.editAppointment.flAssigneeContainer.removeViews(
                     0,
-                    binding.editTask.flAssigneeContainer.childCount - 1
+                    binding.editAppointment.flAssigneeContainer.childCount - 1
                 )
                 //add the chips to the assignee container
                 for (i in 0 until dialogBinding.flAssigneeContainer.childCount - 1) {
@@ -385,7 +312,7 @@ class TaskEditActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                     createChip(
                         this,
                         assignee.tag as Serializable,
-                        binding.editTask.flAssigneeContainer,
+                        binding.editAppointment.flAssigneeContainer,
                         null
                     )
                 }

@@ -9,6 +9,6 @@ data class TaskInfo(
     val due_time: String,
     val assigned_users: List<Int>,
     val assigned_groups: List<Int>,
-    val subject: SubjectInfo? = null,
     val tags: List<String> = listOf(),
+    val subject: SubjectInfo? = null,
 )

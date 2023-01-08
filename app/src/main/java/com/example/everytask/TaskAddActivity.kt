@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
@@ -71,6 +72,28 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
         
         binding.editTask.etAssignees.inputType = 0
 
+        //set on enter listener
+        binding.editTask.etTag.setImeActionLabel("Add", EditorInfo.IME_ACTION_NEXT)
+        binding.editTask.etTag.setOnEditorActionListener { _, actionId, _ ->
+            if(binding.editTask.lvTagContainer.childCount < 5){
+                if (actionId == EditorInfo.IME_ACTION_DONE|| actionId == EditorInfo.IME_ACTION_NEXT) {
+                    val chip = Chip(this)
+                    chip.text = binding.editTask.etTag.text.toString()
+                    chip.isCloseIconVisible = true
+                    chip.isClickable = false
+                    chip.setOnCloseIconClickListener {
+                        binding.editTask.lvTagContainer.removeView(chip)
+                        binding.editTask.etTag.error = null
+                    }
+                    binding.editTask.lvTagContainer.addView(chip)
+                    binding.editTask.etTag.text?.clear()
+                }
+            }else{
+                binding.editTask.etTag.error = "You can only add 5 tags"
+            }
+            true
+        }
+
         pickDate()
 
         getDateTimeCalendar()
@@ -130,6 +153,10 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
         val title = binding.editTask.etTitle.text.toString()
         val description = binding.editTask.etDescription.text.toString()
         val dueDate = "$savedYear-$savedMonth-$savedDay $savedHour:$savedMinute:00"
+        val tags = mutableListOf<String>()
+        for (i in 0 until binding.editTask.lvTagContainer.childCount) {
+            tags.add((binding.editTask.lvTagContainer.getChildAt(i) as Chip).text.toString())
+        }
 
         if (title.isEmpty()) {
             binding.editTask.etTitle.error = "Title cannot be empty"
@@ -163,11 +190,11 @@ class TaskAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener,
 
         val call = retrofitBuilder.addTask(
             TOKEN,
-            TaskInfo(title, description, dueDate, assignedUsers, assignedGroups)
+            TaskInfo(title, description, dueDate, assignedUsers, assignedGroups, tags)
         )
         Log.d(
             "TAG",
-            "addTask: ${TaskInfo(title, description, dueDate, assignedUsers, assignedGroups)}"
+            "addTask: ${TaskInfo(title, description, dueDate, assignedUsers, assignedGroups, tags)}"
         )
         call.enqueue(object : Callback<Default> {
             override fun onResponse(call: Call<Default>, response: Response<Default>) {

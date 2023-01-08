@@ -13,9 +13,9 @@
         android:icon="@drawable/ic_baseline_groups_24" />
 
     <item
-        android:id="@+id/connections"
-        android:title="@string/connections"
-        android:icon="@drawable/ic_baseline_connections_24" />
+        android:id="@+id/appointments"
+        android:title="Appointments"
+        android:icon="@drawable/ic_baseline_appointments_24" />
 
     <item
         android:id="@+id/settings"

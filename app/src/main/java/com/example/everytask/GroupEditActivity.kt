@@ -513,13 +513,13 @@ class GroupEditActivity : AppCompatActivity() {
         memberAdapter.notifyDataSetChanged()
     }
 
-    fun showKickAlert(member: GroupUser, dialog: Dialog) {
+    fun showKickAlert(member: GroupUser, bottomsheetdialog: Dialog) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Kick ${member.username}?")
         builder.setMessage("Are you sure you want to kick this user?")
         builder.setPositiveButton("Confirm") { dialog, which ->
             kickMember(member)
-            dialog.dismiss()
+            bottomsheetdialog.dismiss()
         }
         builder.setNegativeButton("Cancel") { dialog, which ->
             dialog.dismiss()

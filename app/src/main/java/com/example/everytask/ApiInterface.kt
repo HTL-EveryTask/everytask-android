@@ -83,7 +83,7 @@ interface ApiInterface {
         @Body taskInfo: TaskInfo
     ): Call<Default>
 
-    @HTTP(method = "DELETE", path = "task/{id}", hasBody = true)
+    @HTTP(method = "DELETE", path = "task/{id}")
     fun deleteTask(
         @Header("Authorization") token: String,
         @Path("id") id: Int
@@ -103,6 +103,38 @@ interface ApiInterface {
         @Body taskInfo: TaskInfo
     ): Call<Default>
 
+    // Appointments --------------------------------------------------------------------------------------------
+
+    @GET("appointment")
+    fun getAppointments(
+        @Header("Authorization") token: String
+    ): Call<Default>
+
+    @GET("appointment/{id}")
+    fun getSingleAppointment(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): Call<Default>
+
+    @POST("appointment")
+    fun addAppointment(
+        @Header("Authorization") token: String,
+        @Body appointmentInfo: AppointmentInfo
+    ): Call<Default>
+
+    @HTTP(method = "DELETE", path = "appointment/{id}")
+    fun deleteAppointment(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): Call<Default>
+
+    @PATCH("appointment/{id}")
+    fun updateAppointment(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body appointmentInfo: AppointmentInfo
+    ): Call<Default>
+    
     // GROUPS --------------------------------------------------------------------------------------------
 
     @GET("groups")
