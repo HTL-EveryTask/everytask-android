@@ -135,7 +135,7 @@ internal fun validEmail(email: String): String? {
     }
 }
 
-internal fun createChip(context: Context, assignee: Serializable, chipGroup: FlexboxLayout, adapter: AssigneeAdapter?) {
+internal fun createChip(context: Context, assignee: Serializable, chipGroup: ViewGroup, adapter: AssigneeAdapter?) {
     val chip = Chip(context)
     chip.tag = assignee
     if(assignee is GroupUser) {

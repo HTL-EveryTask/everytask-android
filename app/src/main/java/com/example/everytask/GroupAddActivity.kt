@@ -185,7 +185,7 @@ class GroupAddActivity : AppCompatActivity() {
     fun initializeAssignables() {
         getMembers(groups)
 
-        val filteredList = members.sortedWith(compareBy { it !is AssignedGroup }).toMutableList()
+        val filteredList = members.toMutableList()
 
         Log.d("TAG", filteredList.toString())
 
@@ -202,11 +202,7 @@ class GroupAddActivity : AppCompatActivity() {
             dialog.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.show()
 
-            filteredList.sortWith(
-                compareBy(
-                    { it !is Group },
-                    { if (it is Group) it.name else (it as GroupUser).username })
-            )
+            filteredList.sortWith(compareBy { (it as GroupUser).username })
 
             val adapter = AssigneeAdapter(
                 this,
@@ -275,13 +271,8 @@ class GroupAddActivity : AppCompatActivity() {
         for (i in 1 until binding.flMemberContainer.childCount) {
             val member = binding.flMemberContainer.getChildAt(i)
             if (member is Chip) {
-                if (member.tag == GroupUser::class.java.name) {
-                    //get the id of the user
-                    members.first() { it is GroupUser && it.username == member.text }.let {
-                        memberIds.add(
-                            (it as GroupUser).id
-                        )
-                    }
+                if (member.tag is GroupUser) {
+                    memberIds.add((member.tag as GroupUser).id)
                 }
             }
         }
