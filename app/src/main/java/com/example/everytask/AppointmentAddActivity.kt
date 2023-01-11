@@ -20,6 +20,7 @@ import com.example.everytask.databinding.ActivityAppointmentAddBinding
 import com.example.everytask.databinding.ActivityTaskAddBinding
 import com.example.everytask.databinding.DialogSearchableSpinnerBinding
 import com.example.everytask.models.call.AppointmentInfo
+import com.example.everytask.models.call.SubjectInfo
 import com.example.everytask.models.call.TaskInfo
 import com.example.everytask.models.response.tasks.Task
 import com.example.everytask.models.response.Default
@@ -168,10 +169,11 @@ class AppointmentAddActivity : AppCompatActivity(), DatePickerDialog.OnDateSetLi
         val description = binding.editAppointment.etDescription.text.toString()
         val startDate = binding.editAppointment.etStartTime.text.toString()
         val endDate = binding.editAppointment.etEndTime.text.toString()
-        val tags = mutableListOf<String>()
+        var tags : MutableList<String>?= mutableListOf<String>()
         for (i in 0 until binding.editAppointment.lvTagContainer.childCount) {
-            tags.add((binding.editAppointment.lvTagContainer.getChildAt(i) as Chip).text.toString())
+            tags!!.add((binding.editAppointment.lvTagContainer.getChildAt(i) as Chip).text.toString())
         }
+        tags = if(tags!!.isEmpty()) null else tags
 
         if (title.isEmpty()) {
             binding.editAppointment.etTitle.error = "Title cannot be empty"

@@ -112,6 +112,7 @@ class AppointmentsFragment : Fragment() {
             dialog.dismiss()
         }
         builder.show()
+
     }
 
     override fun onDestroyView() {
@@ -122,23 +123,5 @@ class AppointmentsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         getAppointments()
-    }
-
-    fun toggleDone(id: Int, checked: Boolean) {
-        val call = retrofitBuilder.toggleDone(TOKEN, id, mapOf("is_done" to checked))
-        call.enqueue(object : Callback<Default> {
-            override fun onResponse(call: Call<Default>, response: Response<Default>) {
-                if (response.isSuccessful) {
-                    Log.d("TAG", "onResponse: ${response.body()}")
-                } else {
-                    Log.d("TAG", "onResponse: ${response.body()}")
-                }
-            }
-
-            override fun onFailure(call: Call<Default>, t: Throwable) {
-                Toast.makeText(context, "No connection to server", Toast.LENGTH_SHORT).show()
-                Log.d("TAG", "onFailure: ${t.message}")
-            }
-        })
     }
 }
